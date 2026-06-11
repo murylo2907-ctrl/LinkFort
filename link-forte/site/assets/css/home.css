@@ -1,0 +1,626 @@
+/* Home — fiel ao Elementor post-18 / post-63 do linkforte.com.br */
+
+[data-page="home"] .container {
+  width: 100%;
+  max-width: 1280px;
+  margin-inline: auto;
+  padding-inline: 10px;
+}
+
+/* Header */
+[data-page="home"] .header .container {
+  justify-content: space-between;
+  gap: 0;
+  padding: 10px;
+}
+
+[data-page="home"] .logo {
+  flex: 0 0 auto;
+  max-width: none;
+  text-align: left;
+}
+
+[data-page="home"] .logo img {
+  width: 179px;
+  max-width: 100%;
+  height: auto;
+  margin: 0;
+}
+
+[data-page="home"] .nav {
+  gap: 0;
+  margin-left: auto;
+}
+
+[data-page="home"] .nav a {
+  margin-inline: 22px;
+}
+
+/* Hero */
+[data-page="home"] .hero {
+  padding: 0;
+  min-height: 0;
+  display: block;
+}
+
+[data-page="home"] .hero-grid {
+  max-width: 1280px;
+  margin-inline: auto;
+  padding: 70px;
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  grid-template-rows: 1fr;
+  align-items: center;
+  justify-items: center;
+  min-height: 600px;
+  gap: 0;
+}
+
+[data-page="home"] .hero-copy {
+  justify-self: start;
+  width: 100%;
+}
+
+[data-page="home"] .hero-title,
+[data-page="home"] .hero-subtitle {
+  margin-top: 0;
+}
+
+[data-page="home"] .hero-title {
+  font-family: "Raleway", sans-serif;
+  font-size: 55px;
+  font-weight: 700;
+  line-height: 1.1;
+  color: #0f0f0f;
+  margin-bottom: 1rem;
+}
+
+[data-page="home"] .hero-title span {
+  font-weight: 900;
+  background: linear-gradient(90deg, #111687, #1196be);
+  -webkit-background-clip: text;
+  background-clip: text;
+  -webkit-text-fill-color: transparent;
+  display: inline-block;
+}
+
+[data-page="home"] .hero-subtitle {
+  font-family: "Raleway", sans-serif;
+  font-size: 23px;
+  font-weight: 400;
+  line-height: 25px;
+  color: #383838;
+  max-width: 93%;
+  margin-bottom: 2rem;
+  text-transform: none;
+  letter-spacing: normal;
+}
+
+[data-page="home"] .hero-subtitle span {
+  font-weight: 600;
+  background: linear-gradient(90deg, #111687, #1196be);
+  -webkit-background-clip: text;
+  background-clip: text;
+  -webkit-text-fill-color: transparent;
+}
+
+[data-page="home"] .hero-visual {
+  width: 100%;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+
+[data-page="home"] .hero-visual img {
+  width: 100%;
+  max-width: 750px;
+  height: auto;
+}
+
+/* Produtos na home */
+[data-page="home"] .section-products {
+  padding: 70px 0;
+}
+
+[data-page="home"] .section-products .container {
+  padding-inline: 70px;
+}
+
+[data-page="home"] #products-home.products-grid {
+  grid-template-columns: repeat(4, 1fr);
+  gap: 65px 35px;
+}
+
+/* Vantagens — gradiente azul (1f84d62) */
+[data-page="home"] .benefits-section {
+  background: linear-gradient(180deg, #11288f 0%, #1182b6 100%);
+  padding: 50px 0;
+}
+
+[data-page="home"] .benefits-section__inner {
+  max-width: 1280px;
+  margin-inline: auto;
+  padding: 0 50px;
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: 40px;
+}
+
+[data-page="home"] .benefits-section__title {
+  font-family: "Raleway", sans-serif;
+  font-size: 24px;
+  font-weight: 600;
+  line-height: 1.35;
+  color: #fff;
+  max-width: 43%;
+  margin: 0;
+  text-align: left;
+}
+
+[data-page="home"] .benefits-row {
+  width: 100%;
+  display: grid;
+  grid-template-columns: repeat(5, 1fr);
+  gap: 1rem;
+}
+
+[data-page="home"] .benefit-item {
+  text-align: center;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 10px;
+}
+
+[data-page="home"] .benefit-item img {
+  width: auto;
+  height: auto;
+  max-width: 76px;
+  margin-inline: auto;
+}
+
+[data-page="home"] .benefit-item h3 {
+  font-family: "Raleway", sans-serif;
+  font-size: 18px;
+  font-weight: 600;
+  line-height: 1.25;
+  color: #fff;
+  margin: 0;
+}
+
+[data-page="home"] .benefits-section__note {
+  font-family: "Raleway", sans-serif;
+  font-size: 18px;
+  font-weight: 300;
+  font-style: italic;
+  line-height: 28px;
+  color: #fff;
+  margin: 0;
+  text-align: left;
+  max-width: 100%;
+}
+
+/* Valores + CTA — 7f96524 */
+[data-page="home"] .about-section {
+  background: #fff;
+  padding: 0;
+}
+
+[data-page="home"] .about-section__inner {
+  max-width: 1280px;
+  margin-inline: auto;
+  padding: 70px;
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  align-items: center;
+  justify-items: center;
+  gap: 2rem;
+  min-height: 600px;
+}
+
+[data-page="home"] .values-grid {
+  width: 100%;
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  grid-template-rows: repeat(2, 1fr);
+  border: 1px solid #b6b6b6;
+  border-radius: 12px;
+  overflow: hidden;
+  aspect-ratio: 1;
+  max-width: 100%;
+}
+
+[data-page="home"] .value-cell {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 10px;
+  padding: 35px;
+  min-height: 0;
+  text-align: center;
+}
+
+[data-page="home"] .value-cell img {
+  width: auto;
+  height: auto;
+  max-height: 65px;
+  margin-inline: auto;
+}
+
+[data-page="home"] .value-cell h3 {
+  font-family: "Raleway", sans-serif;
+  font-size: 18px;
+  font-weight: 600;
+  margin: 0;
+}
+
+[data-page="home"] .value-cell--gradient-tl {
+  background: linear-gradient(169deg, #11288f 0%, #1182b6 100%);
+  border-radius: 12px 0 0 0;
+  color: #fff;
+}
+
+[data-page="home"] .value-cell--gradient-tl h3 {
+  color: #fff;
+}
+
+[data-page="home"] .value-cell--gradient-br {
+  background: linear-gradient(169deg, #11288f 0%, #1182b6 100%);
+  border-radius: 0 0 12px 0;
+  color: #fff;
+}
+
+[data-page="home"] .value-cell--gradient-br h3 {
+  color: #fff;
+}
+
+[data-page="home"] .value-cell--light {
+  background: #fff;
+}
+
+[data-page="home"] .value-cell--light h3 {
+  color: #1e1e1e;
+}
+
+[data-page="home"] .about-copy {
+  width: 100%;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  gap: 1.25rem;
+}
+
+[data-page="home"] .about-copy h2 {
+  font-family: "Raleway", sans-serif;
+  font-size: 29px;
+  font-weight: 700;
+  line-height: 38px;
+  color: #0f0f0f;
+  margin: 0;
+  max-width: 90%;
+}
+
+[data-page="home"] .about-copy h2 span {
+  font-weight: bold;
+  background: linear-gradient(90deg, #111687, #1196be);
+  -webkit-background-clip: text;
+  background-clip: text;
+  -webkit-text-fill-color: transparent;
+  display: inline;
+}
+
+[data-page="home"] .about-copy p {
+  font-family: "Raleway", sans-serif;
+  font-size: 18px;
+  font-weight: 300;
+  line-height: 25px;
+  color: #1e1e1e;
+  margin: 0;
+  max-width: 98%;
+}
+
+[data-page="home"] .btn-outline-dark {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  background: #fff;
+  color: #000;
+  border: 1px solid #000;
+  border-radius: 12px;
+  padding: 15px 65px;
+  font-family: "Raleway", sans-serif;
+  font-size: 17px;
+  font-weight: 500;
+  width: fit-content;
+  transition: background 0.2s, color 0.2s;
+}
+
+[data-page="home"] .btn-outline-dark:hover {
+  background: #000;
+  color: #fff;
+  transform: none;
+}
+
+[data-page="home"] .btn-white {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  background: #fff;
+  color: #000;
+  border: none;
+  border-radius: 12px;
+  padding: 15px 65px;
+  font-family: "Raleway", sans-serif;
+  font-size: 16px;
+  font-weight: 500;
+  transition: opacity 0.2s;
+}
+
+[data-page="home"] .btn-white:hover {
+  opacity: 0.9;
+  transform: none;
+}
+
+/* Parceiro — 83e28c7 */
+[data-page="home"] .partner-section {
+  background: #fff;
+}
+
+[data-page="home"] .partner-section__inner {
+  max-width: 1280px;
+  margin-inline: auto;
+  padding: 50px;
+  display: flex;
+  flex-direction: column;
+  gap: 40px;
+}
+
+[data-page="home"] .partner-card {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 1.25rem;
+  padding: 30px;
+  border-radius: 12px;
+  text-align: center;
+}
+
+[data-page="home"] .partner-card h2 {
+  font-family: "Raleway", sans-serif;
+  font-size: 22px;
+  font-weight: 600;
+  line-height: 1.35;
+  margin: 0;
+  max-width: 39%;
+}
+
+[data-page="home"] .partner-card--gradient {
+  background: linear-gradient(173deg, #112b91 0%, #117db4 100%);
+}
+
+[data-page="home"] .partner-card--gradient h2 {
+  color: #fff;
+}
+
+[data-page="home"] .partner-card--outline {
+  background: #fff;
+  border: 1px solid #000;
+}
+
+[data-page="home"] .partner-card--outline h2 {
+  color: #212529;
+}
+
+@media (max-width: 1366px) {
+  [data-page="home"] .hero-title {
+    font-size: 48px;
+  }
+
+  [data-page="home"] .hero-subtitle {
+    font-size: 18px;
+    max-width: 100%;
+  }
+
+  [data-page="home"] #products-home.products-grid {
+    grid-template-columns: repeat(3, 1fr);
+  }
+
+  [data-page="home"] .benefits-section__title {
+    max-width: 62%;
+  }
+}
+
+@media (max-width: 1024px) {
+  [data-page="home"] .hero-grid {
+    grid-template-columns: 1fr;
+    padding: 40px;
+    min-height: 600px;
+  }
+
+  [data-page="home"] .hero-copy {
+    justify-self: center;
+    text-align: center;
+  }
+
+  [data-page="home"] .hero-title {
+    font-size: 48px;
+    text-align: center;
+  }
+
+  [data-page="home"] .hero-subtitle {
+    font-size: 22px;
+    text-align: center;
+    margin-inline: auto;
+  }
+
+  [data-page="home"] .hero .btn-hero {
+    margin-inline: auto;
+  }
+
+  [data-page="home"] .hero-visual {
+    order: -1;
+  }
+
+  [data-page="home"] .logo img {
+    width: 100%;
+  }
+
+  [data-page="home"] .logo {
+    flex: 0 0 31%;
+    max-width: 31%;
+  }
+
+  [data-page="home"] #products-home.products-grid {
+    grid-template-columns: repeat(2, 1fr);
+  }
+
+  [data-page="home"] .section-products .container {
+    padding-inline: 40px;
+  }
+
+  [data-page="home"] .benefits-section__inner {
+    padding: 0 40px;
+  }
+
+  [data-page="home"] .benefits-row {
+    grid-template-columns: repeat(3, 1fr);
+    row-gap: 2rem;
+  }
+
+  [data-page="home"] .benefits-section__title {
+    max-width: 80%;
+    text-align: center;
+    align-self: center;
+  }
+
+  [data-page="home"] .benefits-section__note {
+    text-align: center;
+    align-self: center;
+  }
+
+  [data-page="home"] .about-section__inner {
+    grid-template-columns: 1fr;
+    padding: 40px;
+    min-height: auto;
+  }
+
+  [data-page="home"] .values-grid {
+    aspect-ratio: auto;
+  }
+
+  [data-page="home"] .value-cell {
+    min-height: 140px;
+  }
+
+  [data-page="home"] .about-copy h2,
+  [data-page="home"] .about-copy p {
+    max-width: 100%;
+    text-align: center;
+  }
+
+  [data-page="home"] .about-copy {
+    align-items: center;
+  }
+
+  [data-page="home"] .partner-section__inner {
+    padding: 40px;
+    gap: 30px;
+  }
+
+  [data-page="home"] .partner-card h2 {
+    max-width: 72%;
+  }
+}
+
+@media (max-width: 767px) {
+  [data-page="home"] .hero-grid {
+    padding: 20px;
+    min-height: 550px;
+  }
+
+  [data-page="home"] .hero-title {
+    font-size: 29px;
+  }
+
+  [data-page="home"] .hero-subtitle {
+    font-size: 12px;
+    line-height: 1.3;
+  }
+
+  [data-page="home"] .logo {
+    flex: 0 0 74%;
+    max-width: 74%;
+  }
+
+  [data-page="home"] #products-home.products-grid {
+    grid-template-columns: 1fr;
+  }
+
+  [data-page="home"] .section-products {
+    padding: 20px 0;
+  }
+
+  [data-page="home"] .section-products .container {
+    padding-inline: 20px;
+  }
+
+  [data-page="home"] .benefits-section {
+    padding: 20px 0;
+  }
+
+  [data-page="home"] .benefits-section__inner {
+    padding: 0 20px;
+    gap: 20px;
+  }
+
+  [data-page="home"] .benefits-section__title {
+    max-width: 100%;
+    font-size: 22px;
+  }
+
+  [data-page="home"] .benefits-row {
+    grid-template-columns: repeat(2, 1fr);
+  }
+
+  [data-page="home"] .benefit-item h3 {
+    font-size: 16px;
+  }
+
+  [data-page="home"] .benefits-section__note {
+    font-size: 12px;
+    line-height: 1.3;
+  }
+
+  [data-page="home"] .about-section__inner {
+    padding: 20px;
+  }
+
+  [data-page="home"] .about-copy h2 {
+    font-size: 21px;
+    line-height: 1.2;
+  }
+
+  [data-page="home"] .about-copy p {
+    font-size: 12px;
+    line-height: 1.3;
+  }
+
+  [data-page="home"] .partner-section__inner {
+    padding: 20px;
+    gap: 20px;
+  }
+
+  [data-page="home"] .partner-card h2 {
+    max-width: 100%;
+    font-size: 20px;
+  }
+
+  [data-page="home"] .btn-outline-dark,
+  [data-page="home"] .btn-white {
+    font-size: 13px;
+    padding: 12px 40px;
+  }
+}

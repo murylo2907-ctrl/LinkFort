@@ -1,0 +1,10 @@
+{
+  "name": "link-forte-clone",
+  "version": "1.0.0",
+  "private": true,
+  "description": "Réplica estática do site linkforte.com.br extraída via API pública WordPress/WooCommerce",
+  "scripts": {
+    "build": "node scripts/build.mjs",
+    "serve": "npx --yes serve site -l 3000"
+  }
+}
