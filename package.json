@@ -1,0 +1,13 @@
+{
+  "name": "sintra-motos",
+  "version": "0.1.0",
+  "private": true,
+  "description": "Portal SINTRAMOTOS — modernização do site institucional e loja virtual",
+  "scripts": {
+    "dev": "serve link-forte/site -l 3000",
+    "build": "npm run build --prefix link-forte"
+  },
+  "devDependencies": {
+    "serve": "^14.2.4"
+  }
+}

@@ -1,0 +1,8 @@
+# Dependências locais (npm install)
+node_modules/
+
+# Sistema / editor
+.DS_Store
+Thumbs.db
+*.log
+.npm-cache/
