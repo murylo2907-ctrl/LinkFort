@@ -325,8 +325,7 @@ async function renderProductDetail() {
                                     <li class="additional_information_tab" id="tab-title-additional_information"><a href="#tab-additional_information" role="tab">Informação adicional</a></li>
                                   </ul>
                                   <div class="woocommerce-Tabs-panel woocommerce-Tabs-panel--description panel entry-content wc-tab active" id="tab-description" role="tabpanel">
-                                    <h2>Descrição</h2>
-                                    <p><strong>${desc}</strong></p>
+                                    ${desc}
                                   </div>
                                   <div class="woocommerce-Tabs-panel woocommerce-Tabs-panel--additional_information panel entry-content wc-tab" id="tab-additional_information" role="tabpanel">
                                     <h2>Informação adicional</h2>
