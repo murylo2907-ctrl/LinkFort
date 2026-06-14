@@ -412,10 +412,111 @@ function setActiveNav() {
   });
 }
 
+async function loadSiteConfig() {
+  const res = await fetch(`${getBasePath()}data/site.json`);
+  return res.json();
+}
+
+function findLowestPrice(products) {
+  let lowest = null;
+  for (const product of products) {
+    const value = parsePrice(product.priceMin);
+    if (lowest === null || value < lowest.value) {
+      lowest = { value, priceMin: product.priceMin, installment: product.installment };
+    }
+  }
+  return lowest;
+}
+
+function initHeroRotator(headlines, intervalMs) {
+  const el = document.querySelector("[data-hero-rotator]");
+  if (!el || !headlines?.length) return;
+
+  const reducedMotion = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+  if (reducedMotion || headlines.length <= 1) return;
+
+  let index = 0;
+
+  setInterval(() => {
+    el.classList.add("is-fading");
+    setTimeout(() => {
+      index = (index + 1) % headlines.length;
+      el.innerHTML = headlines[index];
+      el.classList.remove("is-fading");
+    }, 500);
+  }, intervalMs || 4000);
+}
+
+async function renderHeroPriceWidget() {
+  const el = document.getElementById("hero-price");
+  if (!el) return;
+
+  try {
+    const products = await loadProducts();
+    const lowest = findLowestPrice(products);
+    if (!lowest) return;
+
+    const installment = (lowest.value / 3).toLocaleString("pt-BR", {
+      minimumFractionDigits: 2,
+      maximumFractionDigits: 2,
+    });
+
+    el.innerHTML = `
+      <p class="hero-price__main">A partir de <strong>R$&nbsp;${lowest.priceMin}</strong></p>
+      <p class="hero-price__sub">Em até 3x de R$&nbsp;${installment} sem juros · À vista no Pix</p>
+    `;
+  } catch {
+    /* mantém fallback estático do HTML */
+  }
+}
+
+function initHeroWhatsApp(message) {
+  const btn = document.querySelector(".js-hero-wpp");
+  if (!btn) return;
+
+  btn.addEventListener("click", (e) => {
+    e.preventDefault();
+    const text = message || "Olá! Gostaria de falar com um especialista sobre certificado digital.";
+    window.open(`https://wa.me/${SITE.whatsapp}?text=${encodeURIComponent(text)}`, "_blank");
+  });
+}
+
+async function initHeroHome() {
+  if (document.body.dataset.page !== "home") return;
+
+  try {
+    const config = await loadSiteConfig();
+    const hero = config.hero || {};
+
+    if (hero.eyebrow) {
+      const eyebrow = document.querySelector(".hero-eyebrow");
+      if (eyebrow) eyebrow.textContent = hero.eyebrow;
+    }
+
+    if (hero.subtitle) {
+      const subtitle = document.querySelector(".hero-subtitle");
+      if (subtitle) {
+        subtitle.innerHTML = hero.subtitle.replace(
+          /certificado digital/gi,
+          '<span>certificado digital</span>'
+        );
+      }
+    }
+
+    initHeroRotator(hero.headlines, hero.rotateIntervalMs);
+    initHeroWhatsApp(hero.whatsappMessage);
+  } catch {
+    initHeroWhatsApp();
+  }
+
+  renderHeroPriceWidget();
+}
+
 document.addEventListener("DOMContentLoaded", () => {
   initMobileMenu();
   initContactForm();
   setActiveNav();
+  initHeroHome();
   renderProductGrid("#products-home", 8);
   renderProductGrid("#products-shop");
   renderProductDetail();

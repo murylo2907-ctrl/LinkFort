@@ -148,6 +148,14 @@ for (const page of pagesRaw) {
   };
 }
 
+const sitePath = path.join(dataDir, "site.json");
+let existingHero;
+try {
+  existingHero = JSON.parse(fs.readFileSync(sitePath, "utf8")).hero;
+} catch {
+  existingHero = undefined;
+}
+
 const site = {
   name: "Link Forte",
   tagline: "Certificado Digital | Curitiba",
@@ -164,13 +172,15 @@ const site = {
   source: "https://linkforte.com.br",
 };
 
+if (existingHero) site.hero = existingHero;
+
 fs.mkdirSync(dataDir, { recursive: true });
 fs.writeFileSync(
   path.join(dataDir, "products.json"),
   JSON.stringify(products, null, 2)
 );
 fs.writeFileSync(path.join(dataDir, "pages.json"), JSON.stringify(pages, null, 2));
-fs.writeFileSync(path.join(dataDir, "site.json"), JSON.stringify(site, null, 2));
+fs.writeFileSync(sitePath, JSON.stringify(site, null, 2));
 
 console.log(`Produtos: ${products.length}`);
 console.log(`Páginas de produto geradas: ${products.length}`);
