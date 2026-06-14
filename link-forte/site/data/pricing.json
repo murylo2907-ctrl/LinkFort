@@ -1,0 +1,223 @@
+{
+  "version": "2026.06.14",
+  "effectiveFrom": "2026-06-14T00:00:00.000Z",
+  "currency": "BRL",
+  "entries": [
+    {
+      "key": "ecnpj|A1|1",
+      "type": "ecnpj",
+      "model": "A1",
+      "a3Variant": null,
+      "years": 1,
+      "price": 240,
+      "slug": "e-cnpj-a1-em-arquivo"
+    },
+    {
+      "key": "ecnpj|A1|2",
+      "type": "ecnpj",
+      "model": "A1",
+      "a3Variant": null,
+      "years": 2,
+      "price": 324,
+      "slug": "e-cnpj-a1-em-arquivo"
+    },
+    {
+      "key": "ecnpj|A1|3",
+      "type": "ecnpj",
+      "model": "A1",
+      "a3Variant": null,
+      "years": 3,
+      "price": 408,
+      "slug": "e-cnpj-a1-em-arquivo"
+    },
+    {
+      "key": "ecnpj|A3|leitora|1",
+      "type": "ecnpj",
+      "model": "A3",
+      "a3Variant": "leitora",
+      "years": 1,
+      "price": 370,
+      "slug": "e-cnpj-a3-leitora-smart-card"
+    },
+    {
+      "key": "ecnpj|A3|leitora|2",
+      "type": "ecnpj",
+      "model": "A3",
+      "a3Variant": "leitora",
+      "years": 2,
+      "price": 385,
+      "slug": "e-cnpj-a3-leitora-smart-card"
+    },
+    {
+      "key": "ecnpj|A3|leitora|3",
+      "type": "ecnpj",
+      "model": "A3",
+      "a3Variant": "leitora",
+      "years": 3,
+      "price": 400,
+      "slug": "e-cnpj-a3-leitora-smart-card"
+    },
+    {
+      "key": "ecnpj|A3|sem_midia|1",
+      "type": "ecnpj",
+      "model": "A3",
+      "a3Variant": "sem_midia",
+      "years": 1,
+      "price": 300,
+      "slug": "e-cnpj-a3-sem-midia-inclusa"
+    },
+    {
+      "key": "ecnpj|A3|sem_midia|2",
+      "type": "ecnpj",
+      "model": "A3",
+      "a3Variant": "sem_midia",
+      "years": 2,
+      "price": 320,
+      "slug": "e-cnpj-a3-sem-midia-inclusa"
+    },
+    {
+      "key": "ecnpj|A3|sem_midia|3",
+      "type": "ecnpj",
+      "model": "A3",
+      "a3Variant": "sem_midia",
+      "years": 3,
+      "price": 340,
+      "slug": "e-cnpj-a3-sem-midia-inclusa"
+    },
+    {
+      "key": "ecnpj|A3|token|1",
+      "type": "ecnpj",
+      "model": "A3",
+      "a3Variant": "token",
+      "years": 1,
+      "price": 380,
+      "slug": "e-cnpj-a3-token"
+    },
+    {
+      "key": "ecnpj|A3|token|2",
+      "type": "ecnpj",
+      "model": "A3",
+      "a3Variant": "token",
+      "years": 2,
+      "price": 400,
+      "slug": "e-cnpj-a3-token"
+    },
+    {
+      "key": "ecnpj|A3|token|3",
+      "type": "ecnpj",
+      "model": "A3",
+      "a3Variant": "token",
+      "years": 3,
+      "price": 420,
+      "slug": "e-cnpj-a3-token"
+    },
+    {
+      "key": "ecpf|A1|1",
+      "type": "ecpf",
+      "model": "A1",
+      "a3Variant": null,
+      "years": 1,
+      "price": 165,
+      "slug": "e-cpf-a1-em-arquivo"
+    },
+    {
+      "key": "ecpf|A1|2",
+      "type": "ecpf",
+      "model": "A1",
+      "a3Variant": null,
+      "years": 2,
+      "price": 222.75,
+      "slug": "e-cpf-a1-em-arquivo"
+    },
+    {
+      "key": "ecpf|A1|3",
+      "type": "ecpf",
+      "model": "A1",
+      "a3Variant": null,
+      "years": 3,
+      "price": 280.5,
+      "slug": "e-cpf-a1-em-arquivo"
+    },
+    {
+      "key": "ecpf|A3|leitora|1",
+      "type": "ecpf",
+      "model": "A3",
+      "a3Variant": "leitora",
+      "years": 1,
+      "price": 300,
+      "slug": "e-cpf-a3-leitora-smart-card"
+    },
+    {
+      "key": "ecpf|A3|leitora|2",
+      "type": "ecpf",
+      "model": "A3",
+      "a3Variant": "leitora",
+      "years": 2,
+      "price": 320,
+      "slug": "e-cpf-a3-leitora-smart-card"
+    },
+    {
+      "key": "ecpf|A3|leitora|3",
+      "type": "ecpf",
+      "model": "A3",
+      "a3Variant": "leitora",
+      "years": 3,
+      "price": 340,
+      "slug": "e-cpf-a3-leitora-smart-card"
+    },
+    {
+      "key": "ecpf|A3|sem_midia|1",
+      "type": "ecpf",
+      "model": "A3",
+      "a3Variant": "sem_midia",
+      "years": 1,
+      "price": 280,
+      "slug": "e-cpf-a3-sem-midia-inclusa"
+    },
+    {
+      "key": "ecpf|A3|sem_midia|2",
+      "type": "ecpf",
+      "model": "A3",
+      "a3Variant": "sem_midia",
+      "years": 2,
+      "price": 378,
+      "slug": "e-cpf-a3-sem-midia-inclusa"
+    },
+    {
+      "key": "ecpf|A3|sem_midia|3",
+      "type": "ecpf",
+      "model": "A3",
+      "a3Variant": "sem_midia",
+      "years": 3,
+      "price": 476,
+      "slug": "e-cpf-a3-sem-midia-inclusa"
+    },
+    {
+      "key": "ecpf|A3|token|1",
+      "type": "ecpf",
+      "model": "A3",
+      "a3Variant": "token",
+      "years": 1,
+      "price": 340,
+      "slug": "e-cpf-a3-token"
+    },
+    {
+      "key": "ecpf|A3|token|2",
+      "type": "ecpf",
+      "model": "A3",
+      "a3Variant": "token",
+      "years": 2,
+      "price": 360,
+      "slug": "e-cpf-a3-token"
+    },
+    {
+      "key": "ecpf|A3|token|3",
+      "type": "ecpf",
+      "model": "A3",
+      "a3Variant": "token",
+      "years": 3,
+      "price": 380,
+      "slug": "e-cpf-a3-token"
+    }
+  ]
+}

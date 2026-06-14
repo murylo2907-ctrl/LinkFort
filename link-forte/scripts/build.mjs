@@ -35,6 +35,83 @@ function download(url, dest) {
   return dest;
 }
 
+function parsePriceStr(priceStr) {
+  return parseFloat(String(priceStr).replace(/\./g, "").replace(",", "."));
+}
+
+function seedPriceForYears(product, years) {
+  const min = parsePriceStr(product.priceMin);
+  const max = parsePriceStr(product.priceMax);
+  if (!product.priceRange) {
+    if (years === 1) return min;
+    if (years === 2) return Math.round(min * 1.35 * 100) / 100;
+    return Math.round(min * 1.7 * 100) / 100;
+  }
+  if (years === 1) return min;
+  if (years === 2) return Math.round(((min + max) / 2) * 100) / 100;
+  return max;
+}
+
+function buildPricingKey(type, model, a3Variant, years) {
+  if (model === "A3" && a3Variant) return `${type}|A3|${a3Variant}|${years}`;
+  return `${type}|${model}|${years}`;
+}
+
+function seedPricingEntries(productList) {
+  const catalog = Object.fromEntries(productList.map((p) => [p.slug, p]));
+  const specs = [
+    ["ecpf", "A1", null, "e-cpf-a1-em-arquivo"],
+    ["ecpf", "A3", "token", "e-cpf-a3-token"],
+    ["ecpf", "A3", "leitora", "e-cpf-a3-leitora-smart-card"],
+    ["ecpf", "A3", "sem_midia", "e-cpf-a3-sem-midia-inclusa"],
+    ["ecnpj", "A1", null, "e-cnpj-a1-em-arquivo"],
+    ["ecnpj", "A3", "token", "e-cnpj-a3-token"],
+    ["ecnpj", "A3", "leitora", "e-cnpj-a3-leitora-smart-card"],
+    ["ecnpj", "A3", "sem_midia", "e-cnpj-a3-sem-midia-inclusa"],
+  ];
+
+  const entries = [];
+  for (const [type, model, a3Variant, slug] of specs) {
+    const product = catalog[slug];
+    if (!product) continue;
+    for (const years of [1, 2, 3]) {
+      entries.push({
+        key: buildPricingKey(type, model, a3Variant, years),
+        type,
+        model,
+        a3Variant,
+        years,
+        price: seedPriceForYears(product, years),
+        slug,
+      });
+    }
+  }
+  return entries;
+}
+
+function mergePricingFile(productList) {
+  const pricingPath = path.join(dataDir, "pricing.json");
+  let existing = { version: "2026.06.14", effectiveFrom: new Date().toISOString(), currency: "BRL", entries: [] };
+  try {
+    existing = JSON.parse(fs.readFileSync(pricingPath, "utf8"));
+  } catch {
+    /* novo arquivo */
+  }
+
+  const byKey = new Map((existing.entries || []).map((e) => [e.key, e]));
+  for (const entry of seedPricingEntries(productList)) {
+    if (!byKey.has(entry.key)) byKey.set(entry.key, entry);
+  }
+
+  const merged = {
+    ...existing,
+    currency: existing.currency || "BRL",
+    entries: [...byKey.values()].sort((a, b) => a.key.localeCompare(b.key)),
+  };
+
+  fs.writeFileSync(pricingPath, JSON.stringify(merged, null, 2));
+}
+
 const productsRaw = JSON.parse(
   fs.readFileSync(path.join(rawDir, "products.json"), "utf8")
 );
@@ -181,6 +258,7 @@ fs.writeFileSync(
 );
 fs.writeFileSync(path.join(dataDir, "pages.json"), JSON.stringify(pages, null, 2));
 fs.writeFileSync(sitePath, JSON.stringify(site, null, 2));
+mergePricingFile(products);
 
 console.log(`Produtos: ${products.length}`);
 console.log(`Páginas de produto geradas: ${products.length}`);

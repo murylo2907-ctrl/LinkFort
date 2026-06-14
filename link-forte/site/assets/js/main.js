@@ -512,11 +512,134 @@ async function initHeroHome() {
   renderHeroPriceWidget();
 }
 
+const QUOTE_TYPE_LABELS = { ecpf: "e-CPF", ecnpj: "e-CNPJ" };
+const QUOTE_VARIANT_LABELS = {
+  token: "Token USB",
+  leitora: "Leitora + Smart Card",
+  sem_midia: "Sem mídia inclusa",
+};
+
+function buildQuoteKey(type, model, a3Variant, years) {
+  if (model === "A3") return `${type}|A3|${a3Variant}|${years}`;
+  return `${type}|${model}|${years}`;
+}
+
+function getQuoteSelection(root) {
+  const read = (group) =>
+    root.querySelector(`[data-quote-group="${group}"] .quote-option[aria-pressed="true"]`)?.dataset.value;
+
+  const type = read("type") || "ecpf";
+  const model = read("model") || "A1";
+  const years = Number(read("years") || "1");
+  const a3Variant = model === "A3" ? read("a3Variant") || "token" : null;
+
+  return { type, model, years, a3Variant };
+}
+
+function formatQuoteSummary({ type, model, years, a3Variant }) {
+  const parts = [QUOTE_TYPE_LABELS[type] || type, model, `${years} ano${years > 1 ? "s" : ""}`];
+  if (model === "A3" && a3Variant) parts.splice(2, 0, QUOTE_VARIANT_LABELS[a3Variant] || a3Variant);
+  return parts.join(" · ");
+}
+
+async function initCertificateQuoter() {
+  const root = document.getElementById("cotador-certificado");
+  if (!root || document.body.dataset.page !== "loja") return;
+
+  const priceEl = root.querySelector("[data-quote-price]");
+  const installmentEl = root.querySelector("[data-quote-installment]");
+  const summaryEl = root.querySelector("[data-quote-summary]");
+  const versionEl = root.querySelector("[data-quote-version]");
+  const buyBtn = root.querySelector(".js-quote-buy");
+  const a3Panel = root.querySelector("[data-quote-a3-panel]");
+  const modelStep = a3Panel?.closest(".quote-step--model");
+
+  let pricing;
+  let priceMap;
+
+  try {
+    const res = await fetch(`${getBasePath()}data/pricing.json`);
+    pricing = await res.json();
+    priceMap = new Map((pricing.entries || []).map((e) => [e.key, e]));
+  } catch {
+    if (priceEl) priceEl.textContent = "Indisponível";
+    buyBtn?.classList.add("is-disabled");
+    return;
+  }
+
+  if (versionEl && pricing.version) {
+    const date = pricing.effectiveFrom
+      ? new Date(pricing.effectiveFrom).toLocaleDateString("pt-BR")
+      : "";
+    versionEl.textContent = date ? `Tabela v${pricing.version} · vigente desde ${date}` : `Tabela v${pricing.version}`;
+  }
+
+  const params = new URLSearchParams(window.location.search);
+  const preset = {
+    type: params.get("tipo") || undefined,
+    model: params.get("modelo") || undefined,
+    years: params.get("anos") ? Number(params.get("anos")) : undefined,
+    a3Variant: params.get("variante") || undefined,
+  };
+
+  function setGroupValue(group, value) {
+    root.querySelectorAll(`[data-quote-group="${group}"] .quote-option`).forEach((btn) => {
+      btn.setAttribute("aria-pressed", btn.dataset.value === value ? "true" : "false");
+    });
+  }
+
+  if (preset.type) setGroupValue("type", preset.type);
+  if (preset.model) setGroupValue("model", preset.model);
+  if (preset.years) setGroupValue("years", String(preset.years));
+  if (preset.a3Variant) setGroupValue("a3Variant", preset.a3Variant);
+
+  function updateQuote() {
+    const selection = getQuoteSelection(root);
+    a3Panel?.classList.toggle("is-hidden", selection.model !== "A3");
+    modelStep?.classList.toggle("quote-step--a3-open", selection.model === "A3");
+
+    const key = buildQuoteKey(selection.type, selection.model, selection.a3Variant, selection.years);
+    const entry = priceMap.get(key);
+
+    if (!entry) {
+      if (summaryEl) summaryEl.textContent = formatQuoteSummary(selection);
+      if (priceEl) priceEl.innerHTML = '<span class="quote-unavailable">Consulte nosso time</span>';
+      if (installmentEl) installmentEl.textContent = "";
+      buyBtn?.classList.add("is-disabled");
+      return;
+    }
+
+    const installment = entry.price / 3;
+    if (summaryEl) summaryEl.textContent = formatQuoteSummary(selection);
+    if (priceEl) priceEl.textContent = `R$ ${formatBRL(entry.price)}`;
+    if (installmentEl) {
+      installmentEl.textContent = `Em até 3x de R$ ${formatBRL(installment)} sem juros · À vista no Pix`;
+    }
+
+    if (buyBtn) {
+      buyBtn.href = productPath(entry.slug);
+      buyBtn.classList.remove("is-disabled");
+    }
+  }
+
+  root.querySelectorAll(".quote-option").forEach((btn) => {
+    btn.addEventListener("click", () => {
+      const group = btn.closest("[data-quote-group]")?.dataset.quoteGroup;
+      if (!group) return;
+      setGroupValue(group, btn.dataset.value);
+      updateQuote();
+    });
+  });
+
+  updateQuote();
+}
+
 document.addEventListener("DOMContentLoaded", () => {
   initMobileMenu();
   initContactForm();
   setActiveNav();
   initHeroHome();
+  initCertificateQuoter();
   renderProductGrid("#products-home", 8);
   renderProductGrid("#products-shop");
   renderProductDetail();

@@ -10,6 +10,8 @@
     "instagram": "https://www.instagram.com/linkforte",
     "facebook": "https://www.facebook.com/linkforte"
   },
+  "scrapedAt": "2026-06-14T09:16:34.284Z",
+  "source": "https://linkforte.com.br",
   "hero": {
     "eyebrow": "Certificado Digital ICP-Brasil · Curitiba",
     "subtitle": "Segurança e rapidez nas suas transações online. Emita seu certificado digital no conforto de casa.",
@@ -21,7 +23,5 @@
       "Validação por <span>videoconferência</span> disponível"
     ],
     "rotateIntervalMs": 4000
-  },
-  "scrapedAt": "2026-06-14T08:34:25.446Z",
-  "source": "https://linkforte.com.br"
+  }
 }
