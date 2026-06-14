@@ -988,15 +988,6 @@ ul {
 
   .nav {
     display: none;
-    position: absolute;
-    top: 100%;
-    left: 0;
-    right: 0;
-    background: #fff;
-    flex-direction: column;
-    padding: 1rem;
-    border-bottom: 1px solid var(--border);
-    box-shadow: var(--shadow);
   }
 
   .nav.open {

@@ -697,22 +697,88 @@ function initMegaNavA11y(nav) {
   });
 
   document.addEventListener("click", (e) => {
-    if (!nav.contains(e.target)) closeAllMegaItems();
+    if (isDesktopNav() && !nav.contains(e.target)) closeAllMegaItems();
   });
 
   document.addEventListener("keydown", (e) => {
-    if (e.key === "Escape") closeAllMegaItems();
+    if (isDesktopNav() && e.key === "Escape") closeAllMegaItems();
   });
 
   window.addEventListener("resize", updateHeaderBottomVar);
   window.addEventListener("scroll", updateHeaderBottomVar, { passive: true });
 }
 
+function setupMobileDrawer(nav) {
+  const version = "2";
+  if (nav.dataset.mobileDrawerReady === version) {
+    return document.querySelector(".mobile-drawer__backdrop");
+  }
+
+  nav.querySelector(".mobile-drawer__head")?.remove();
+  nav.querySelector(".mobile-drawer__cta")?.remove();
+  const oldScroll = nav.querySelector(".mobile-drawer__scroll");
+  if (oldScroll) {
+    const list = oldScroll.querySelector(".mega-nav__list");
+    if (list) oldScroll.parentNode.insertBefore(list, oldScroll);
+    oldScroll.remove();
+  }
+
+  const list = nav.querySelector(".mega-nav__list");
+  if (!list) return null;
+
+  let backdrop = document.querySelector(".mobile-drawer__backdrop");
+  if (!backdrop) {
+    backdrop = document.createElement("div");
+    backdrop.className = "mobile-drawer__backdrop";
+    backdrop.setAttribute("aria-hidden", "true");
+    document.body.appendChild(backdrop);
+  }
+
+  const head = document.createElement("div");
+  head.className = "mobile-drawer__head";
+  head.innerHTML = `
+    <div class="mobile-drawer__head-inner">
+      <div class="mobile-drawer__brand">
+        <p class="mobile-drawer__label">Menu</p>
+        <p class="mobile-drawer__title">Link Forte</p>
+      </div>
+      <button type="button" class="mobile-drawer__close" aria-label="Fechar menu">
+        <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M19 6.41L17.59 5 12 10.59 6.41 5 5 6.41 10.59 12 5 17.59 6.41 19 12 13.41 17.59 19 19 17.59 13.41 12 19 6.41z"/></svg>
+      </button>
+    </div>
+  `;
+
+  const scroll = document.createElement("div");
+  scroll.className = "mobile-drawer__scroll";
+  list.parentNode.insertBefore(scroll, list);
+  scroll.appendChild(list);
+
+  nav.prepend(head);
+  nav.dataset.mobileDrawerReady = version;
+  return backdrop;
+}
+
+function openMobileDrawer(nav, toggle, backdrop) {
+  nav.classList.add("open");
+  backdrop?.classList.add("is-visible");
+  document.body.classList.add("drawer-open");
+  toggle?.setAttribute("aria-expanded", "true");
+}
+
+function closeMobileDrawer(nav, toggle, backdrop) {
+  nav.classList.remove("open");
+  backdrop?.classList.remove("is-visible");
+  document.body.classList.remove("drawer-open");
+  toggle?.setAttribute("aria-expanded", "false");
+  closeAllMegaItems();
+}
+
 function bindMegaNavLinks(nav) {
   nav.querySelectorAll("a.mega-nav__link, a.mega-nav__col-link, a.mega-nav__promo-cta").forEach((link) => {
     link.addEventListener("click", (e) => {
-      nav.classList.remove("open");
-      closeAllMegaItems();
+      const toggle = document.querySelector(".menu-toggle");
+      const backdrop = document.querySelector(".mobile-drawer__backdrop");
+      closeMobileDrawer(nav, toggle, backdrop);
 
       const href = link.getAttribute("href");
       if (!href?.includes("#")) return;
@@ -747,6 +813,7 @@ async function initMegaNav() {
     initMegaNavA11y(nav);
     updateHeaderBottomVar();
     setActiveNav();
+    setupMobileDrawer(nav);
     bindMegaNavLinks(nav);
   } catch {
     nav.innerHTML = `
@@ -758,6 +825,7 @@ async function initMegaNav() {
         <li><a href="${navHref("contato.html", getBasePath())}" class="mega-nav__link" data-nav="contato">Suporte</a></li>
       </ul>`;
     setActiveNav();
+    setupMobileDrawer(nav);
     bindMegaNavLinks(nav);
   }
 }
@@ -767,11 +835,26 @@ function initMobileMenu() {
   const nav = document.querySelector(".nav");
   if (!toggle || !nav) return;
 
+  const backdrop = setupMobileDrawer(nav) || document.querySelector(".mobile-drawer__backdrop");
+
+  nav.querySelector(".mobile-drawer__close")?.addEventListener("click", () => {
+    closeMobileDrawer(nav, toggle, backdrop);
+  });
+
+  backdrop?.addEventListener("click", () => {
+    closeMobileDrawer(nav, toggle, backdrop);
+  });
+
   toggle.addEventListener("click", () => {
-    const opening = !nav.classList.contains("open");
-    nav.classList.toggle("open");
-    toggle.setAttribute("aria-expanded", opening ? "true" : "false");
-    if (!opening) closeAllMegaItems();
+    if (nav.classList.contains("open")) closeMobileDrawer(nav, toggle, backdrop);
+    else openMobileDrawer(nav, toggle, backdrop);
+  });
+
+  document.addEventListener("keydown", (e) => {
+    if (e.key === "Escape" && nav.classList.contains("open")) {
+      closeMobileDrawer(nav, toggle, backdrop);
+      toggle.focus();
+    }
   });
 }
 
