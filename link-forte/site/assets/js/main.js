@@ -379,14 +379,399 @@ async function renderProductDetail() {
   }
 }
 
+const NAV_CHEVRON = `<svg class="mega-nav__chevron" viewBox="0 0 24 24" aria-hidden="true"><path d="M7 10l5 5 5-5z"/></svg>`;
+
+const NAV_ICONS = {
+  certificate: `<svg viewBox="0 0 24 24"><path d="M12 2l8 4v6c0 5.05-3.03 9.67-7.75 11.65L12 22l-.25-.35C7.03 19.67 4 15.05 4 12V6l8-4zm0 2.18L6 7.5V12c0 2.45 1.85 5.83 6 7.88 4.15-2.05 6-5.43 6-7.88V7.5l-6-3.32z"/></svg>`,
+  user: `<svg viewBox="0 0 24 24"><path d="M12 12c2.7 0 4.8-2.1 4.8-4.8S14.7 2.4 12 2.4 7.2 4.5 7.2 7.2 9.3 12 12 12zm0 2.4c-3.2 0-9.6 1.62-9.6 4.8V22h19.2v-2.4c0-3.18-6.4-4.8-9.6-4.8z"/></svg>`,
+  building: `<svg viewBox="0 0 24 24"><path d="M4 21V3h10v18H4zm12 0V9h4v12h-4zM8 7h2v2H8V7zm0 4h2v2H8v-2zm4-4h2v2h-2V7zm0 4h2v2h-2v-2z"/></svg>`,
+  stethoscope: `<svg viewBox="0 0 24 24"><path d="M19 8a3 3 0 00-3 3v1.5a4.5 4.5 0 01-4.5 4.5h-.5a4.5 4.5 0 01-4.5-4.5V11a3 3 0 10-6 0v2.5A6.5 6.5 0 0010 20h.5v2h3v-2H14a6.5 6.5 0 006-6.5V11a3 3 0 003-3z"/></svg>`,
+  scale: `<svg viewBox="0 0 24 24"><path d="M12 2l3 7h4l-5.5 6.5L16 22H8l2.5-6.5L5 9h4l3-7z"/></svg>`,
+  handshake: `<svg viewBox="0 0 24 24"><path d="M11 6V3h2v3h3v2h-3v3h-2V8H8V6h3zm-1 5.5l2 2 4-4 1.4 1.4-5.4 5.4-3.4-3.4L6 14.9 4.6 13.5 10 8.1l2 2 2-2 1.4 1.4-2 2z"/></svg>`,
+  headset: `<svg viewBox="0 0 24 24"><path d="M12 2a7 7 0 00-7 7v4a3 3 0 003 3h1v-5H7v-2a5 5 0 0110 0v2h-2v5h1a3 3 0 003-3V9a7 7 0 00-7-7z"/></svg>`,
+  phone: `<svg viewBox="0 0 24 24"><path d="M6.6 10.8c1.4 2.8 3.4 4.8 6.2 6.2l2.1-2.1c.3-.3.7-.4 1-.2 1.1.4 2.3.6 3.5.6.6 0 1 .4 1 1V20c0 .6-.4 1-1 1C10.1 21 3 13.9 3 5c0-.6.4-1 1-1h3.5c.6 0 1 .4 1 1 0 1.2.2 2.4.6 3.5.1.3 0 .7-.2 1L6.6 10.8z"/></svg>`,
+  mail: `<svg viewBox="0 0 24 24"><path d="M20 4H4c-1.1 0-2 .9-2 2v12c0 1.1.9 2 2 2h16c1.1 0 2-.9 2-2V6c0-1.1-.9-2-2-2zm0 4l-8 5-8-5V6l8 5 8-5v2z"/></svg>`,
+  whatsapp: `<svg viewBox="0 0 24 24"><path d="M12 2C6.5 2 2 6.5 2 12c0 1.9.5 3.7 1.4 5.3L2 22l4.9-1.3A9.9 9.9 0 0012 22c5.5 0 10-4.5 10-10S17.5 2 12 2zm5.2 14.2c-.2.6-1.2 1.1-1.7 1.2-.5.1-1 .2-2.4-.5-2-.8-3.3-2.7-3.4-2.8-.1-.1-1.4-1.8-1.4-3.5s.9-2.5 1.2-2.8c.3-.3.7-.4 1-.4h.7c.2 0 .5-.1.7.5.2.6.8 2 .9 2.1.1.1.1.3 0 .4-.1.2-.2.3-.3.5-.1.1-.2.2-.3.3-.1.1-.2.2-.1.4.1.2.6 1 1.3 1.6.9.8 1.6 1 1.9 1.1.3.1.5.1.7-.1.2-.2.8-1 1-1.3.2-.3.5-.2.7-.1.2.1 1.4.7 1.6.8.2.1.3.2.4.3-.1.1-.1.1-.3.7z"/></svg>`,
+  instagram: `<svg viewBox="0 0 24 24"><path d="M7 2h10a5 5 0 015 5v10a5 5 0 01-5 5H7a5 5 0 01-5-5V7a5 5 0 015-5zm10 2H7a3 3 0 00-3 3v10a3 3 0 003 3h10a3 3 0 003-3V7a3 3 0 00-3-3zm-5 3.5A5.5 5.5 0 1111.5 18 5.5 5.5 0 0112 7.5zm0 2A3.5 3.5 0 1015.5 13 3.5 3.5 0 0012 9.5zM17.8 6.2a1.2 1.2 0 11-1.2 1.2 1.2 1.2 0 011.2-1.2z"/></svg>`,
+  facebook: `<svg viewBox="0 0 24 24"><path d="M13 3h4a1 1 0 011 1v3h-3a2 2 0 00-2 2v3h5l-1 4h-4v8h-4v-8H7v-4h4V8a5 5 0 015-5z"/></svg>`,
+};
+
+function navHref(href, basePath) {
+  if (/^(https?:|mailto:|tel:)/.test(href)) return href;
+  return `${basePath}${href}`;
+}
+
+function navIcon(name) {
+  return NAV_ICONS[name] || NAV_ICONS.certificate;
+}
+
+function groupProductsForNav(products) {
+  const groups = { ecpf: [], ecnpj: [], profissionais: [] };
+  for (const product of products) {
+    const name = product.name.toLowerCase();
+    const slug = product.slug.toLowerCase();
+    if (name.includes("e-cpf") || slug.startsWith("e-cpf")) groups.ecpf.push(product);
+    else if (name.includes("e-cnpj") || slug.startsWith("e-cnpj")) groups.ecnpj.push(product);
+    else if (
+      name.includes("médico") ||
+      name.includes("medico") ||
+      slug.includes("medico") ||
+      name.includes("advogado") ||
+      slug.includes("advogado")
+    ) {
+      groups.profissionais.push(product);
+    }
+  }
+  return groups;
+}
+
+function renderNavProductLink(product, iconName) {
+  const price = formatPriceDisplay(product);
+  const slugAttr = product.slug ? ` data-nav-product="${product.slug}"` : "";
+  return `
+    <li>
+      <a href="${productPath(product.slug)}" class="mega-nav__col-link"${slugAttr}>
+        <span class="mega-nav__col-link-icon">${navIcon(iconName)}</span>
+        <span class="mega-nav__col-link-text">
+          <span>${product.name}</span>
+          <span class="mega-nav__col-link-price">${price}</span>
+        </span>
+      </a>
+    </li>`;
+}
+
+function renderNavColLink(link, basePath) {
+  const href = navHref(link.href, basePath);
+  const external = link.external ? ' target="_blank" rel="noopener"' : "";
+  const dataNav = link.dataNav ? ` data-nav="${link.dataNav}"` : "";
+  return `
+    <li>
+      <a href="${href}" class="mega-nav__col-link"${dataNav}${external}>
+        <span class="mega-nav__col-link-icon">${navIcon(link.icon || "certificate")}</span>
+        <span class="mega-nav__col-link-text"><span>${link.label}</span></span>
+      </a>
+    </li>`;
+}
+
+function renderPromoAside(promo, { priceLine, whatsappHref } = {}) {
+  const href = whatsappHref || navHref(promo.href || "#", getBasePath());
+  const external = whatsappHref ? ' target="_blank" rel="noopener"' : "";
+  return `
+    <aside class="mega-nav__promo">
+      <h3 class="mega-nav__promo-title">${promo.title}</h3>
+      ${promo.text ? `<p class="mega-nav__promo-text">${promo.text}</p>` : ""}
+      ${priceLine ? `<p class="mega-nav__promo-price">${priceLine}</p>` : ""}
+      <a href="${href}" class="mega-nav__promo-cta"${external}>${promo.cta || "Saiba mais"}</a>
+    </aside>`;
+}
+
+function renderCertificadosPanel(groups, navConfig, lowest, basePath) {
+  const promo = navConfig?.certificados?.promo || {};
+  const priceLine = lowest ? `A partir de <strong>R$&nbsp;${lowest.priceMin}</strong>` : "";
+  const promoHtml = renderPromoAside(
+    { ...promo, href: promo.href || "loja.html#cotador-certificado", cta: promo.cta || "Abrir configurador" },
+    { priceLine }
+  );
+
+  const col = (title, items, icon, showFooter) => `
+    <div class="mega-nav__col">
+      <h3 class="mega-nav__col-title">${title}</h3>
+      <ul class="mega-nav__col-links">${items.map((p) => renderNavProductLink(p, icon)).join("")}</ul>
+      ${showFooter ? `<div class="mega-nav__col-footer"><a href="${navHref("loja.html", basePath)}" data-nav="loja">Ver todos os certificados</a></div>` : ""}
+    </div>`;
+
+  return `
+    <div id="mega-panel-certificados" class="mega-nav__panel" role="region" aria-label="Certificados" hidden>
+      <div class="mega-nav__panel-inner">
+        <div class="mega-nav__grid mega-nav__grid--cert">
+          ${col("Pessoa física", groups.ecpf, "user", false)}
+          ${col("Pessoa jurídica", groups.ecnpj, "building", false)}
+          ${col("Profissionais", groups.profissionais, "stethoscope", true)}
+          ${promoHtml}
+        </div>
+      </div>
+    </div>`;
+}
+
+function renderParceriasPanel(navConfig, basePath) {
+  const section = navConfig?.parcerias || {};
+  const links = (section.links || []).map((l) => renderNavColLink(l, basePath)).join("");
+  const promo = section.promo || {
+    title: "Seja parceiro Link Forte",
+    text: "Revenda certificados digitais com suporte da nossa equipe.",
+    cta: "Quero ser parceiro",
+    href: "seja-parceiro.html",
+  };
+
+  return `
+    <div id="mega-panel-parcerias" class="mega-nav__panel" role="region" aria-label="Parcerias" hidden>
+      <div class="mega-nav__panel-inner">
+        <div class="mega-nav__grid mega-nav__grid--duo">
+          <div class="mega-nav__col">
+            <h3 class="mega-nav__col-title">Parcerias</h3>
+            <ul class="mega-nav__col-links">${links}</ul>
+          </div>
+          <div class="mega-nav__col">
+            <h3 class="mega-nav__col-title">Benefícios</h3>
+            <ul class="mega-nav__bullets">
+              <li>Comissão por venda de certificados</li>
+              <li>Suporte técnico e comercial</li>
+              <li>Material e treinamento para revenda</li>
+            </ul>
+          </div>
+          ${renderPromoAside(promo)}
+        </div>
+      </div>
+    </div>`;
+}
+
+function renderSuportePanel(navConfig, basePath) {
+  const section = navConfig?.suporte || {};
+  const links = section.links || [];
+  const atendimento = links.filter((l) => !["whatsapp", "instagram", "facebook"].includes(l.icon));
+  const social = links.filter((l) => ["instagram", "facebook"].includes(l.icon));
+  const canais = [
+    {
+      label: "WhatsApp",
+      href: `https://wa.me/${SITE.whatsapp}`,
+      icon: "whatsapp",
+      external: true,
+    },
+    ...social,
+  ];
+  const promo = section.promo || {};
+  const waMsg = promo.whatsappMessage || "Olá! Preciso de ajuda com certificado digital.";
+  const whatsappHref = `https://wa.me/${SITE.whatsapp}?text=${encodeURIComponent(waMsg)}`;
+  const promoHtml = renderPromoAside({ ...promo, cta: promo.cta || "Iniciar conversa" }, { whatsappHref });
+
+  return `
+    <div id="mega-panel-suporte" class="mega-nav__panel" role="region" aria-label="Suporte" hidden>
+      <div class="mega-nav__panel-inner">
+        <div class="mega-nav__grid mega-nav__grid--duo">
+          <div class="mega-nav__col">
+            <h3 class="mega-nav__col-title">Atendimento</h3>
+            <ul class="mega-nav__col-links">${atendimento.map((l) => renderNavColLink(l, basePath)).join("")}</ul>
+          </div>
+          <div class="mega-nav__col">
+            <h3 class="mega-nav__col-title">Canais rápidos</h3>
+            <ul class="mega-nav__col-links">${canais.map((l) => renderNavColLink(l, basePath)).join("")}</ul>
+          </div>
+          ${promoHtml}
+        </div>
+      </div>
+    </div>`;
+}
+
+function renderMegaNav(navConfig, products, basePath) {
+  const groups = groupProductsForNav(products);
+  const lowest = findLowestPrice(products);
+
+  return `
+    <ul class="mega-nav__list">
+      <li><a href="${navHref("index.html", basePath)}" class="mega-nav__link" data-nav="home">Início</a></li>
+      <li class="mega-nav__item" data-mega="certificados">
+        <button type="button" class="mega-nav__trigger" aria-expanded="false" aria-controls="mega-panel-certificados" data-nav="loja">
+          Certificados ${NAV_CHEVRON}
+        </button>
+        ${renderCertificadosPanel(groups, navConfig, lowest, basePath)}
+      </li>
+      <li><a href="${navHref("quem-somos.html", basePath)}" class="mega-nav__link" data-nav="quem-somos">Quem Somos</a></li>
+      <li class="mega-nav__item" data-mega="parcerias">
+        <button type="button" class="mega-nav__trigger" aria-expanded="false" aria-controls="mega-panel-parcerias" data-nav="seja-parceiro">
+          Parcerias ${NAV_CHEVRON}
+        </button>
+        ${renderParceriasPanel(navConfig, basePath)}
+      </li>
+      <li class="mega-nav__item" data-mega="suporte">
+        <button type="button" class="mega-nav__trigger" aria-expanded="false" aria-controls="mega-panel-suporte" data-nav="contato">
+          Suporte ${NAV_CHEVRON}
+        </button>
+        ${renderSuportePanel(navConfig, basePath)}
+      </li>
+    </ul>`;
+}
+
+function isDesktopNav() {
+  return window.matchMedia("(min-width: 901px)").matches;
+}
+
+function updateHeaderBottomVar() {
+  const header = document.querySelector(".header");
+  if (!header) return;
+  document.documentElement.style.setProperty("--header-bottom", `${header.getBoundingClientRect().bottom}px`);
+}
+
+function closeMegaItem(item) {
+  if (!item) return;
+  item.classList.remove("is-open");
+  item.dataset.suppressHover = "true";
+  const trigger = item.querySelector(".mega-nav__trigger");
+  const panel = item.querySelector(".mega-nav__panel");
+  if (trigger) trigger.setAttribute("aria-expanded", "false");
+  if (panel) panel.hidden = true;
+}
+
+function openMegaItem(item) {
+  if (!item) return;
+  document.querySelectorAll(".mega-nav__item.is-open").forEach((other) => {
+    if (other !== item) closeMegaItem(other);
+  });
+  delete item.dataset.suppressHover;
+  item.classList.add("is-open");
+  const trigger = item.querySelector(".mega-nav__trigger");
+  const panel = item.querySelector(".mega-nav__panel");
+  if (trigger) trigger.setAttribute("aria-expanded", "true");
+  if (panel) panel.hidden = false;
+  updateHeaderBottomVar();
+}
+
+function closeAllMegaItems() {
+  document.querySelectorAll(".mega-nav__item.is-open").forEach(closeMegaItem);
+}
+
+function initMegaNavA11y(nav) {
+  const triggers = [...nav.querySelectorAll(".mega-nav__trigger")];
+
+  triggers.forEach((trigger) => {
+    const item = trigger.closest(".mega-nav__item");
+    const panelId = trigger.getAttribute("aria-controls");
+    const panel = panelId ? document.getElementById(panelId) : null;
+
+    trigger.addEventListener("click", (e) => {
+      e.preventDefault();
+      e.stopPropagation();
+      const isOpen = item.classList.contains("is-open");
+
+      if (isOpen) {
+        closeMegaItem(item);
+        if (isDesktopNav()) item.dataset.suppressHover = "true";
+      } else {
+        delete item.dataset.suppressHover;
+        openMegaItem(item);
+      }
+    });
+
+    trigger.addEventListener("keydown", (e) => {
+      const idx = triggers.indexOf(trigger);
+      if (e.key === "ArrowRight") {
+        e.preventDefault();
+        triggers[(idx + 1) % triggers.length].focus();
+      } else if (e.key === "ArrowLeft") {
+        e.preventDefault();
+        triggers[(idx - 1 + triggers.length) % triggers.length].focus();
+      } else if (e.key === "Escape") {
+        closeMegaItem(item);
+        trigger.focus();
+      } else if ((e.key === "Enter" || e.key === " ") && isDesktopNav()) {
+        e.preventDefault();
+        if (item.classList.contains("is-open")) closeMegaItem(item);
+        else openMegaItem(item);
+      }
+    });
+
+    if (panel) {
+      panel.addEventListener("keydown", (e) => {
+        if (e.key === "Escape") {
+          closeMegaItem(item);
+          trigger.focus();
+        }
+      });
+    }
+
+    item.addEventListener("mouseenter", () => {
+      if (isDesktopNav() && item.dataset.suppressHover !== "true") openMegaItem(item);
+    });
+
+    item.addEventListener("mouseleave", () => {
+      delete item.dataset.suppressHover;
+      if (isDesktopNav() && !item.contains(document.activeElement)) closeMegaItem(item);
+    });
+
+    item.addEventListener("focusin", () => {
+      if (isDesktopNav()) openMegaItem(item);
+    });
+
+    item.addEventListener("focusout", (e) => {
+      if (isDesktopNav() && !item.contains(e.relatedTarget)) closeMegaItem(item);
+    });
+  });
+
+  document.addEventListener("click", (e) => {
+    if (!nav.contains(e.target)) closeAllMegaItems();
+  });
+
+  document.addEventListener("keydown", (e) => {
+    if (e.key === "Escape") closeAllMegaItems();
+  });
+
+  window.addEventListener("resize", updateHeaderBottomVar);
+  window.addEventListener("scroll", updateHeaderBottomVar, { passive: true });
+}
+
+function bindMegaNavLinks(nav) {
+  nav.querySelectorAll("a.mega-nav__link, a.mega-nav__col-link, a.mega-nav__promo-cta").forEach((link) => {
+    link.addEventListener("click", (e) => {
+      nav.classList.remove("open");
+      closeAllMegaItems();
+
+      const href = link.getAttribute("href");
+      if (!href?.includes("#")) return;
+
+      const hashIndex = href.indexOf("#");
+      const pathPart = href.slice(0, hashIndex);
+      const hash = href.slice(hashIndex + 1);
+      if (!hash) return;
+
+      const currentFile = window.location.pathname.split("/").pop() || "index.html";
+      const targetFile = pathPart ? pathPart.replace(/^\.\//, "") : currentFile;
+
+      if (targetFile === currentFile || pathPart === "") {
+        const target = document.getElementById(hash);
+        if (target) {
+          e.preventDefault();
+          target.scrollIntoView({ behavior: "smooth", block: "start" });
+          history.pushState(null, "", `#${hash}`);
+        }
+      }
+    });
+  });
+}
+
+async function initMegaNav() {
+  const nav = document.querySelector(".js-mega-nav");
+  if (!nav) return;
+
+  try {
+    const [config, products] = await Promise.all([loadSiteConfig(), loadProducts()]);
+    nav.innerHTML = renderMegaNav(config.navigation || {}, products, getBasePath());
+    initMegaNavA11y(nav);
+    updateHeaderBottomVar();
+    setActiveNav();
+    bindMegaNavLinks(nav);
+  } catch {
+    nav.innerHTML = `
+      <ul class="mega-nav__list">
+        <li><a href="${navHref("index.html", getBasePath())}" class="mega-nav__link" data-nav="home">Início</a></li>
+        <li><a href="${navHref("loja.html", getBasePath())}" class="mega-nav__link" data-nav="loja">Loja</a></li>
+        <li><a href="${navHref("quem-somos.html", getBasePath())}" class="mega-nav__link" data-nav="quem-somos">Quem Somos</a></li>
+        <li><a href="${navHref("seja-parceiro.html", getBasePath())}" class="mega-nav__link" data-nav="seja-parceiro">Parcerias</a></li>
+        <li><a href="${navHref("contato.html", getBasePath())}" class="mega-nav__link" data-nav="contato">Suporte</a></li>
+      </ul>`;
+    setActiveNav();
+    bindMegaNavLinks(nav);
+  }
+}
+
 function initMobileMenu() {
   const toggle = document.querySelector(".menu-toggle");
   const nav = document.querySelector(".nav");
   if (!toggle || !nav) return;
 
-  toggle.addEventListener("click", () => nav.classList.toggle("open"));
-  nav.querySelectorAll("a").forEach((link) => {
-    link.addEventListener("click", () => nav.classList.remove("open"));
+  toggle.addEventListener("click", () => {
+    const opening = !nav.classList.contains("open");
+    nav.classList.toggle("open");
+    toggle.setAttribute("aria-expanded", opening ? "true" : "false");
+    if (!opening) closeAllMegaItems();
   });
 }
 
@@ -406,10 +791,25 @@ function initContactForm() {
 
 function setActiveNav() {
   const page = document.body.dataset.page;
+  const slug = document.body.dataset.slug;
   if (!page) return;
-  document.querySelectorAll(".nav a").forEach((link) => {
-    if (link.dataset.nav === page) link.classList.add("active");
+
+  document.querySelectorAll(".mega-nav__link, .mega-nav__trigger").forEach((el) => {
+    el.classList.remove("active");
   });
+
+  const direct = document.querySelector(`.mega-nav__link[data-nav="${page}"], .mega-nav__trigger[data-nav="${page}"]`);
+  if (direct) {
+    direct.classList.add("active");
+    return;
+  }
+
+  if (page === "produto" && slug) {
+    const productLink = document.querySelector(`.mega-nav__col-link[data-nav-product="${slug}"]`);
+    if (productLink) {
+      document.querySelector('.mega-nav__trigger[data-nav="loja"]')?.classList.add("active");
+    }
+  }
 }
 
 async function loadSiteConfig() {
@@ -635,9 +1035,10 @@ async function initCertificateQuoter() {
 }
 
 document.addEventListener("DOMContentLoaded", () => {
-  initMobileMenu();
+  initMegaNav().then(() => {
+    initMobileMenu();
+  });
   initContactForm();
-  setActiveNav();
   initHeroHome();
   initCertificateQuoter();
   renderProductGrid("#products-home", 8);

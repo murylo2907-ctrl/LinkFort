@@ -10,7 +10,7 @@
     "instagram": "https://www.instagram.com/linkforte",
     "facebook": "https://www.facebook.com/linkforte"
   },
-  "scrapedAt": "2026-06-14T09:16:34.284Z",
+  "scrapedAt": "2026-06-14T09:30:07.018Z",
   "source": "https://linkforte.com.br",
   "hero": {
     "eyebrow": "Certificado Digital ICP-Brasil · Curitiba",
@@ -23,5 +23,81 @@
       "Validação por <span>videoconferência</span> disponível"
     ],
     "rotateIntervalMs": 4000
+  },
+  "navigation": {
+    "certificados": {
+      "promo": {
+        "title": "Monte seu certificado",
+        "text": "Configure tipo, modelo e validade — veja o preço na hora.",
+        "cta": "Abrir configurador",
+        "href": "loja.html#cotador-certificado"
+      }
+    },
+    "parcerias": {
+      "promo": {
+        "title": "Seja parceiro Link Forte",
+        "text": "Revenda certificados digitais com suporte da nossa equipe.",
+        "cta": "Quero ser parceiro",
+        "href": "seja-parceiro.html"
+      },
+      "links": [
+        {
+          "label": "Programa de parceiros",
+          "href": "seja-parceiro.html",
+          "icon": "handshake",
+          "dataNav": "seja-parceiro"
+        },
+        {
+          "label": "Vantagens para revenda",
+          "href": "seja-parceiro.html",
+          "icon": "certificate"
+        },
+        {
+          "label": "Suporte ao parceiro",
+          "href": "contato.html",
+          "icon": "headset"
+        }
+      ]
+    },
+    "suporte": {
+      "promo": {
+        "title": "Fale agora no WhatsApp",
+        "text": "Atendimento humanizado para tirar dúvidas e concluir sua compra.",
+        "cta": "Iniciar conversa",
+        "whatsappMessage": "Olá! Preciso de ajuda com certificado digital."
+      },
+      "links": [
+        {
+          "label": "Página de contato",
+          "href": "contato.html",
+          "icon": "mail",
+          "dataNav": "contato"
+        },
+        {
+          "label": "Telefone (41) 3026-3491",
+          "href": "https://wa.me/554130263491",
+          "icon": "phone",
+          "external": true
+        },
+        {
+          "label": "linkforte@linkforte.com.br",
+          "href": "mailto:linkforte@linkforte.com.br",
+          "icon": "mail",
+          "external": true
+        },
+        {
+          "label": "Instagram",
+          "href": "https://www.instagram.com/linkforte",
+          "icon": "instagram",
+          "external": true
+        },
+        {
+          "label": "Facebook",
+          "href": "https://www.facebook.com/linkforte",
+          "icon": "facebook",
+          "external": true
+        }
+      ]
+    }
   }
 }

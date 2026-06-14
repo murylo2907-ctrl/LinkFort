@@ -167,6 +167,7 @@ const productPageTemplate = (slug) => `<!DOCTYPE html>
   <link href="https://fonts.googleapis.com/css2?family=Raleway:wght@400;500;600;700;800&display=swap" rel="stylesheet">
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
   <link rel="stylesheet" href="../assets/css/style.css">
+  <link rel="stylesheet" href="../assets/css/mega-nav.css">
   <link rel="stylesheet" href="../assets/css/product-layout.css">
   <link rel="stylesheet" href="../assets/css/product-original.css">
   <link rel="icon" href="../assets/images/LINKFORTE-vetor.png">
@@ -176,12 +177,7 @@ const productPageTemplate = (slug) => `<!DOCTYPE html>
   <header class="header">
     <div class="container">
       <a href="../index.html" class="logo"><img src="../assets/images/LINKFORTE-vetor.png" alt="Link Forte"></a>
-      <nav class="nav">
-        <a href="../index.html" data-nav="home">Início</a>
-        <a href="../quem-somos.html" data-nav="quem-somos">Quem Somos</a>
-        <a href="../seja-parceiro.html" data-nav="seja-parceiro">Seja Parceiro</a>
-        <a href="../contato.html" data-nav="contato">Contato</a>
-      </nav>
+      <nav class="nav js-mega-nav" aria-label="Menu principal"></nav>
       <button class="menu-toggle" aria-label="Abrir menu"><svg viewBox="0 0 1000 1000"><path d="M104 333H896C929 333 958 304 958 271S929 208 896 208H104C71 208 42 237 42 271S71 333 104 333ZM104 583H896C929 583 958 554 958 521S929 458 896 458H104C71 458 42 487 42 521S71 583 104 583ZM104 833H896C929 833 958 804 958 771S929 708 896 708H104C71 708 42 737 42 771S71 833 104 833Z"/></svg></button>
     </div>
   </header>
@@ -227,10 +223,14 @@ for (const page of pagesRaw) {
 
 const sitePath = path.join(dataDir, "site.json");
 let existingHero;
+let existingNavigation;
 try {
-  existingHero = JSON.parse(fs.readFileSync(sitePath, "utf8")).hero;
+  const existing = JSON.parse(fs.readFileSync(sitePath, "utf8"));
+  existingHero = existing.hero;
+  existingNavigation = existing.navigation;
 } catch {
   existingHero = undefined;
+  existingNavigation = undefined;
 }
 
 const site = {
@@ -250,6 +250,7 @@ const site = {
 };
 
 if (existingHero) site.hero = existingHero;
+if (existingNavigation) site.navigation = existingNavigation;
 
 fs.mkdirSync(dataDir, { recursive: true });
 fs.writeFileSync(

@@ -32,8 +32,13 @@
   margin-left: auto;
 }
 
-[data-page="home"] .nav a {
-  margin-inline: 22px;
+[data-page="home"] .mega-nav__list {
+  gap: 22px;
+}
+
+[data-page="home"] .mega-nav__link,
+[data-page="home"] .mega-nav__trigger {
+  margin-inline: 0;
 }
 
 /* Hero — conversão */
