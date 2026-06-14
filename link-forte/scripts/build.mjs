@@ -224,13 +224,16 @@ for (const page of pagesRaw) {
 const sitePath = path.join(dataDir, "site.json");
 let existingHero;
 let existingNavigation;
+let existingPersonas;
 try {
   const existing = JSON.parse(fs.readFileSync(sitePath, "utf8"));
   existingHero = existing.hero;
   existingNavigation = existing.navigation;
+  existingPersonas = existing.personas;
 } catch {
   existingHero = undefined;
   existingNavigation = undefined;
+  existingPersonas = undefined;
 }
 
 const site = {
@@ -251,6 +254,7 @@ const site = {
 
 if (existingHero) site.hero = existingHero;
 if (existingNavigation) site.navigation = existingNavigation;
+if (existingPersonas) site.personas = existingPersonas;
 
 fs.mkdirSync(dataDir, { recursive: true });
 fs.writeFileSync(

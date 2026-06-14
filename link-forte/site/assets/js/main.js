@@ -394,6 +394,7 @@ const NAV_ICONS = {
   whatsapp: `<svg viewBox="0 0 24 24"><path d="M12 2C6.5 2 2 6.5 2 12c0 1.9.5 3.7 1.4 5.3L2 22l4.9-1.3A9.9 9.9 0 0012 22c5.5 0 10-4.5 10-10S17.5 2 12 2zm5.2 14.2c-.2.6-1.2 1.1-1.7 1.2-.5.1-1 .2-2.4-.5-2-.8-3.3-2.7-3.4-2.8-.1-.1-1.4-1.8-1.4-3.5s.9-2.5 1.2-2.8c.3-.3.7-.4 1-.4h.7c.2 0 .5-.1.7.5.2.6.8 2 .9 2.1.1.1.1.3 0 .4-.1.2-.2.3-.3.5-.1.1-.2.2-.3.3-.1.1-.2.2-.1.4.1.2.6 1 1.3 1.6.9.8 1.6 1 1.9 1.1.3.1.5.1.7-.1.2-.2.8-1 1-1.3.2-.3.5-.2.7-.1.2.1 1.4.7 1.6.8.2.1.3.2.4.3-.1.1-.1.1-.3.7z"/></svg>`,
   instagram: `<svg viewBox="0 0 24 24"><path d="M7 2h10a5 5 0 015 5v10a5 5 0 01-5 5H7a5 5 0 01-5-5V7a5 5 0 015-5zm10 2H7a3 3 0 00-3 3v10a3 3 0 003 3h10a3 3 0 003-3V7a3 3 0 00-3-3zm-5 3.5A5.5 5.5 0 1111.5 18 5.5 5.5 0 0112 7.5zm0 2A3.5 3.5 0 1015.5 13 3.5 3.5 0 0012 9.5zM17.8 6.2a1.2 1.2 0 11-1.2 1.2 1.2 1.2 0 011.2-1.2z"/></svg>`,
   facebook: `<svg viewBox="0 0 24 24"><path d="M13 3h4a1 1 0 011 1v3h-3a2 2 0 00-2 2v3h5l-1 4h-4v8h-4v-8H7v-4h4V8a5 5 0 015-5z"/></svg>`,
+  calculator: `<svg viewBox="0 0 24 24"><path d="M7 2h10a2 2 0 012 2v16a2 2 0 01-2 2H7a2 2 0 01-2-2V4a2 2 0 012-2zm0 4v2h2V6H7zm4 0v2h2V6h-2zm4 0v2h2V6h-2zM7 10v2h2v-2H7zm4 0v2h2v-2h-2zm4 0v2h2v-2h-2zM7 14v2h2v-2H7zm4 0v4h6v-4h-6z"/></svg>`,
 };
 
 function navHref(href, basePath) {
@@ -862,6 +863,16 @@ function initContactForm() {
   const form = document.getElementById("contact-form");
   if (!form) return;
 
+  const perfilMessages = {
+    contador: "Sou contador(a) e gostaria de saber sobre emissão de certificados digitais para meus clientes.",
+    parceiro: "Tenho interesse no programa de parceria Link Forte.",
+  };
+  const perfil = new URLSearchParams(window.location.search).get("perfil");
+  const msgField = form.querySelector('[name="mensagem"]');
+  if (perfil && perfilMessages[perfil] && msgField && !msgField.value) {
+    msgField.value = perfilMessages[perfil];
+  }
+
   form.addEventListener("submit", (e) => {
     e.preventDefault();
     const data = new FormData(form);
@@ -995,6 +1006,89 @@ async function initHeroHome() {
   renderHeroPriceWidget();
 }
 
+function resolvePersonaHref(persona, basePath) {
+  if (persona.whatsappMessage) {
+    return `https://wa.me/${SITE.whatsapp}?text=${encodeURIComponent(persona.whatsappMessage)}`;
+  }
+  return navHref(persona.href, basePath);
+}
+
+function renderPersonaCard(persona, basePath) {
+  const href = resolvePersonaHref(persona, basePath);
+  const external =
+    persona.external || persona.whatsappMessage ? ' target="_blank" rel="noopener"' : "";
+  return `
+    <a href="${href}" class="persona-card persona-card--${persona.id}"${external}>
+      <span class="persona-card__icon" aria-hidden="true">${navIcon(persona.icon)}</span>
+      <div class="persona-card__body">
+        <h3 class="persona-card__title">${persona.title}</h3>
+        <p class="persona-card__desc">${persona.description}</p>
+        <span class="persona-card__cta">${persona.cta}<svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 4l-1.41 1.41L16.17 11H4v2h12.17l-5.58 5.59L12 20l8-8-8-8z"/></svg></span>
+      </div>
+    </a>`;
+}
+
+const DEFAULT_PERSONAS = {
+  title: "Qual é o seu perfil?",
+  subtitle: "Escolha abaixo e vá direto ao conteúdo certo — sem precisar navegar pelo site",
+  items: [
+    {
+      id: "pf",
+      title: "Pessoa Física",
+      description: "e-CPF para IR, eSocial, assinatura digital e serviços gov.br",
+      cta: "Configurar e-CPF",
+      href: "loja.html?tipo=ecpf#cotador-certificado",
+      icon: "user",
+    },
+    {
+      id: "pj",
+      title: "Pessoa Jurídica",
+      description: "e-CNPJ para NF-e, SPED, contratos e obrigações da empresa",
+      cta: "Configurar e-CNPJ",
+      href: "loja.html?tipo=ecnpj#cotador-certificado",
+      icon: "building",
+    },
+    {
+      id: "contador",
+      title: "Contador",
+      description: "Emissão para clientes PF e PJ com atendimento especializado",
+      cta: "Falar com especialista",
+      href: "contato.html?perfil=contador",
+      icon: "calculator",
+    },
+    {
+      id: "parceiro",
+      title: "Parceiro / Revenda",
+      description: "Revenda certificados digitais com suporte e operação Link Forte",
+      cta: "Quero ser parceiro",
+      href: "seja-parceiro.html",
+      icon: "handshake",
+    },
+  ],
+};
+
+async function initPersonaCards() {
+  const container = document.getElementById("personas-home");
+  if (!container || document.body.dataset.page !== "home") return;
+
+  let section = DEFAULT_PERSONAS;
+  try {
+    const config = await loadSiteConfig();
+    if (config.personas?.items?.length) section = config.personas;
+  } catch {
+    /* fallback */
+  }
+
+  const block = container.closest(".section-personas");
+  const titleEl = block?.querySelector(".section-header h2");
+  const subtitleEl = block?.querySelector(".section-header p");
+  if (titleEl && section.title) titleEl.textContent = section.title;
+  if (subtitleEl && section.subtitle) subtitleEl.textContent = section.subtitle;
+
+  const basePath = getBasePath();
+  container.innerHTML = section.items.map((persona) => renderPersonaCard(persona, basePath)).join("");
+}
+
 const QUOTE_TYPE_LABELS = { ecpf: "e-CPF", ecnpj: "e-CNPJ" };
 const QUOTE_VARIANT_LABELS = {
   token: "Token USB",
@@ -1123,6 +1217,7 @@ document.addEventListener("DOMContentLoaded", () => {
   });
   initContactForm();
   initHeroHome();
+  initPersonaCards();
   initCertificateQuoter();
   renderProductGrid("#products-home", 8);
   renderProductGrid("#products-shop");
