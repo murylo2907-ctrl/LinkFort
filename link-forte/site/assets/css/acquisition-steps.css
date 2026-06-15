@@ -1,0 +1,212 @@
+/* Infográfico — Como funciona a aquisição */
+
+.section-acquisition {
+  padding: 70px 0;
+  background: var(--bg);
+}
+
+.section-acquisition .container {
+  padding-inline: 70px;
+}
+
+.acquisition-steps__track {
+  list-style: none;
+  display: flex;
+  align-items: stretch;
+  gap: 0;
+  margin: 2.5rem 0 0;
+  padding: 0;
+  counter-reset: acquisition-step;
+}
+
+.acquisition-step {
+  flex: 1 1 0;
+  min-width: 0;
+  position: relative;
+  --step-index: 0;
+  opacity: 0;
+  transform: translateY(28px);
+  transition:
+    opacity 0.55s ease,
+    transform 0.55s ease;
+  transition-delay: calc(var(--step-index) * 130ms);
+}
+
+.js-reveal.is-visible .acquisition-step {
+  opacity: 1;
+  transform: none;
+}
+
+.acquisition-step:not(:last-child)::after {
+  content: "";
+  position: absolute;
+  top: 2.65rem;
+  left: calc(50% + 2.1rem);
+  right: calc(-50% + 2.1rem);
+  height: 2px;
+  background: linear-gradient(90deg, var(--primary-mid), rgba(17, 150, 190, 0.25));
+  pointer-events: none;
+  opacity: 0;
+  transform: scaleX(0);
+  transform-origin: left center;
+  transition: opacity 0.4s ease, transform 0.5s ease;
+  transition-delay: calc(var(--step-index) * 130ms + 180ms);
+}
+
+.js-reveal.is-visible .acquisition-step:not(:last-child)::after {
+  opacity: 1;
+  transform: scaleX(1);
+}
+
+.acquisition-step__card {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  text-align: center;
+  gap: 0.65rem;
+  padding: 0 0.5rem;
+  height: 100%;
+}
+
+.acquisition-step__icon {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 5.25rem;
+  height: 5.25rem;
+  border-radius: 50%;
+  background: var(--gradient-blue);
+  color: #fff;
+  box-shadow: 0 8px 24px rgba(17, 22, 135, 0.18);
+  position: relative;
+}
+
+.acquisition-step__icon svg {
+  width: 2rem;
+  height: 2rem;
+  fill: currentColor;
+}
+
+.acquisition-step__num {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 1.5rem;
+  height: 1.5rem;
+  border-radius: 50%;
+  background: var(--primary-light);
+  color: var(--primary);
+  font-size: 0.75rem;
+  font-weight: 800;
+  line-height: 1;
+}
+
+.acquisition-step__body {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 0.35rem;
+}
+
+.acquisition-step__title {
+  font-size: 1rem;
+  font-weight: 700;
+  color: var(--text);
+  line-height: 1.3;
+}
+
+.acquisition-step__desc {
+  font-size: 0.875rem;
+  color: var(--text-muted);
+  line-height: 1.45;
+  max-width: 13rem;
+  margin-inline: auto;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .acquisition-step {
+    opacity: 1;
+    transform: none;
+    transition: none;
+  }
+
+  .acquisition-step:not(:last-child)::after {
+    opacity: 1;
+    transform: none;
+    transition: none;
+  }
+}
+
+@media (max-width: 1100px) {
+  .section-acquisition .container {
+    padding-inline: 40px;
+  }
+
+  .acquisition-step__desc {
+    max-width: 11rem;
+  }
+}
+
+@media (max-width: 900px) {
+  .acquisition-steps__track {
+    flex-direction: column;
+    gap: 1.75rem;
+    max-width: 26rem;
+    margin-inline: auto;
+  }
+
+  .acquisition-step:not(:last-child)::after {
+    top: auto;
+    bottom: -0.95rem;
+    left: 2.625rem;
+    right: auto;
+    width: 2px;
+    height: 1.75rem;
+    transform: scaleY(0);
+    transform-origin: center top;
+    background: linear-gradient(180deg, var(--primary-mid), rgba(17, 150, 190, 0.25));
+  }
+
+  .js-reveal.is-visible .acquisition-step:not(:last-child)::after {
+    transform: scaleY(1);
+  }
+
+  .acquisition-step__card {
+    flex-direction: row;
+    text-align: left;
+    align-items: flex-start;
+    gap: 1rem;
+    padding: 0;
+  }
+
+  .acquisition-step__icon {
+    flex-shrink: 0;
+    width: 4.5rem;
+    height: 4.5rem;
+  }
+
+  .acquisition-step__icon svg {
+    width: 1.65rem;
+    height: 1.65rem;
+  }
+
+  .acquisition-step__body {
+    align-items: flex-start;
+    padding-top: 0.35rem;
+  }
+
+  .acquisition-step__desc {
+    max-width: none;
+    margin-inline: 0;
+  }
+}
+
+@media (max-width: 600px) {
+  .section-acquisition {
+    padding: 50px 0;
+  }
+
+  .section-acquisition .container {
+    padding-inline: 20px;
+  }
+}

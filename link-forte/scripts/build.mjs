@@ -225,15 +225,27 @@ const sitePath = path.join(dataDir, "site.json");
 let existingHero;
 let existingNavigation;
 let existingPersonas;
+let existingAcquisitionSteps;
+let existingModelCompare;
+let existingReviews;
+let existingFaq;
 try {
   const existing = JSON.parse(fs.readFileSync(sitePath, "utf8"));
   existingHero = existing.hero;
   existingNavigation = existing.navigation;
   existingPersonas = existing.personas;
+  existingAcquisitionSteps = existing.acquisitionSteps;
+  existingModelCompare = existing.modelCompare;
+  existingReviews = existing.reviews;
+  existingFaq = existing.faq;
 } catch {
   existingHero = undefined;
   existingNavigation = undefined;
   existingPersonas = undefined;
+  existingAcquisitionSteps = undefined;
+  existingModelCompare = undefined;
+  existingReviews = undefined;
+  existingFaq = undefined;
 }
 
 const site = {
@@ -255,6 +267,10 @@ const site = {
 if (existingHero) site.hero = existingHero;
 if (existingNavigation) site.navigation = existingNavigation;
 if (existingPersonas) site.personas = existingPersonas;
+if (existingAcquisitionSteps) site.acquisitionSteps = existingAcquisitionSteps;
+if (existingModelCompare) site.modelCompare = existingModelCompare;
+if (existingReviews) site.reviews = existingReviews;
+if (existingFaq) site.faq = existingFaq;
 
 fs.mkdirSync(dataDir, { recursive: true });
 fs.writeFileSync(

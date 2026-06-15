@@ -11,6 +11,10 @@
   <link rel="stylesheet" href="assets/css/style.css">
   <link rel="stylesheet" href="assets/css/mega-nav.css">
   <link rel="stylesheet" href="assets/css/home.css">
+  <link rel="stylesheet" href="assets/css/acquisition-steps.css">
+  <link rel="stylesheet" href="assets/css/model-compare.css">
+  <link rel="stylesheet" href="assets/css/reviews-carousel.css">
+  <link rel="stylesheet" href="assets/css/faq.css">
   <link rel="icon" href="assets/images/LINKFORTE-vetor.png">
 </head>
 <body data-page="home">
@@ -73,6 +77,20 @@
       </div>
     </section>
 
+    <section class="section section-acquisition js-reveal" id="como-funciona" aria-labelledby="acquisition-title">
+      <div class="container">
+        <div class="section-header" id="acquisition-header"></div>
+        <ol class="acquisition-steps__track" id="acquisition-steps"></ol>
+      </div>
+    </section>
+
+    <section class="section section-model-compare js-reveal" id="comparativo-a1-a3" aria-labelledby="model-compare-title">
+      <div class="container">
+        <div class="section-header" id="model-compare-header"></div>
+        <div id="model-compare"></div>
+      </div>
+    </section>
+
     <section class="section section-personas" id="personas" aria-labelledby="personas-title">
       <div class="container">
         <div class="section-header">
@@ -81,20 +99,6 @@
           <div class="section-divider"></div>
         </div>
         <div id="personas-home" class="personas-grid"></div>
-      </div>
-    </section>
-
-    <section class="section section-products">
-      <div class="container">
-        <div class="section-header">
-          <h2>Conheça nossos certificados digitais</h2>
-          <p>A facilidade que somente um Certificado Digital pode oferecer para pessoa física e pessoa jurídica</p>
-          <div class="section-divider"></div>
-        </div>
-        <div id="products-home" class="products-grid"></div>
-        <div class="text-center mt-2">
-          <a href="loja.html" class="btn btn-gradient">VER TODOS</a>
-        </div>
       </div>
     </section>
 
@@ -155,16 +159,39 @@
       </div>
     </section>
 
-    <section class="partner-section">
-      <div class="partner-section__inner">
-        <div class="partner-card partner-card--gradient">
-          <h2>Quer se tornar um parceiro da Link Forte?</h2>
-          <a href="seja-parceiro.html" class="btn btn-white">Saiba mais</a>
+    <section class="section section-reviews js-reveal" id="avaliacoes" aria-labelledby="reviews-title">
+      <div class="container">
+        <div class="section-header" id="reviews-header"></div>
+        <div class="reviews-carousel" id="reviews-carousel" data-reviews-carousel>
+          <div class="reviews-carousel__viewport">
+            <div class="reviews-carousel__track" id="reviews-track" aria-live="polite"></div>
+          </div>
+          <div class="reviews-carousel__nav">
+            <button type="button" class="reviews-carousel__btn reviews-carousel__btn--prev" aria-label="Avaliação anterior">
+              <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M15.41 7.41L14 6l-6 6 6 6 1.41-1.41L10.83 12z"/></svg>
+            </button>
+            <div class="reviews-carousel__dots" id="reviews-dots" role="tablist" aria-label="Avaliações"></div>
+            <button type="button" class="reviews-carousel__btn reviews-carousel__btn--next" aria-label="Próxima avaliação">
+              <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M10 6L8.59 7.41 13.17 12l-4.58 4.59L10 18l6-6z"/></svg>
+            </button>
+          </div>
         </div>
-        <div class="partner-card partner-card--outline">
-          <h2>Possui alguma dúvida sobre o certificado?</h2>
-          <a href="contato.html" class="btn btn-outline-dark">Fale com a gente!</a>
+      </div>
+    </section>
+
+    <section class="section section-faq js-reveal" id="faq" aria-labelledby="faq-title">
+      <div class="container">
+        <div class="section-header" id="faq-header"></div>
+        <div class="faq-toolbar">
+          <div class="faq-search">
+            <label class="visually-hidden" for="faq-search">Buscar perguntas frequentes</label>
+            <input type="search" class="faq-search__input" id="faq-search" autocomplete="off" enterkeyhint="search">
+            <ul class="faq-suggestions" id="faq-suggestions" hidden role="listbox" aria-label="Sugestões de perguntas"></ul>
+          </div>
+          <div class="faq-categories" id="faq-categories" role="tablist" aria-label="Categorias de perguntas"></div>
         </div>
+        <div class="faq-list" id="faq-list"></div>
+        <p class="faq-empty" id="faq-empty" hidden>Nenhuma pergunta encontrada para sua busca.</p>
       </div>
     </section>
   </main>

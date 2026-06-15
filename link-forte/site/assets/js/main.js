@@ -395,6 +395,12 @@ const NAV_ICONS = {
   instagram: `<svg viewBox="0 0 24 24"><path d="M7 2h10a5 5 0 015 5v10a5 5 0 01-5 5H7a5 5 0 01-5-5V7a5 5 0 015-5zm10 2H7a3 3 0 00-3 3v10a3 3 0 003 3h10a3 3 0 003-3V7a3 3 0 00-3-3zm-5 3.5A5.5 5.5 0 1111.5 18 5.5 5.5 0 0112 7.5zm0 2A3.5 3.5 0 1015.5 13 3.5 3.5 0 0012 9.5zM17.8 6.2a1.2 1.2 0 11-1.2 1.2 1.2 1.2 0 011.2-1.2z"/></svg>`,
   facebook: `<svg viewBox="0 0 24 24"><path d="M13 3h4a1 1 0 011 1v3h-3a2 2 0 00-2 2v3h5l-1 4h-4v8h-4v-8H7v-4h4V8a5 5 0 015-5z"/></svg>`,
   calculator: `<svg viewBox="0 0 24 24"><path d="M7 2h10a2 2 0 012 2v16a2 2 0 01-2 2H7a2 2 0 01-2-2V4a2 2 0 012-2zm0 4v2h2V6H7zm4 0v2h2V6h-2zm4 0v2h2V6h-2zM7 10v2h2v-2H7zm4 0v2h2v-2h-2zm4 0v2h2v-2h-2zM7 14v2h2v-2H7zm4 0v4h6v-4h-6z"/></svg>`,
+  cart: `<svg viewBox="0 0 24 24"><path d="M7 18c-1.1 0-1.99.9-1.99 2S5.9 22 7 22s2-.9 2-2-.9-2-2-2zM1 2v2h2l3.6 7.59-1.35 2.45c-.16.28-.25.61-.25.96 0 1.1.9 2 2 2h12v-2H7.42c-.14 0-.25-.11-.25-.25l.03-.12.9-1.63h7.45c.75 0 1.41-.41 1.75-1.03l3.58-6.49A1 1 0 0020 4H5.21l-.94-2H1zm16 16c-1.1 0-1.99.9-1.99 2s.89 2 1.99 2 2-.9 2-2-.9-2-2-2z"/></svg>`,
+  videocam: `<svg viewBox="0 0 24 24"><path d="M17 10.5V7a1 1 0 00-1-1H4a1 1 0 00-1 1v10a1 1 0 001 1h12a1 1 0 001-1v-3.5l4 4v-11l-4 4z"/></svg>`,
+  "shield-check": `<svg viewBox="0 0 24 24"><path d="M12 2l8 4v6c0 5.05-3.03 9.67-7.75 11.65L12 22l-.25-.35C7.03 19.67 4 15.05 4 12V6l8-4zm-1.03 13.03l5.66-5.66-1.41-1.41-4.25 4.25-2.12-2.12-1.41 1.41 3.54 3.53z"/></svg>`,
+  download: `<svg viewBox="0 0 24 24"><path d="M19 9h-4V3H9v6H5l7 7 7-7zM5 18v2h14v-2H5z"/></svg>`,
+  file: `<svg viewBox="0 0 24 24"><path d="M14 2H6a2 2 0 00-2 2v16a2 2 0 002 2h12a2 2 0 002-2V8l-6-6zm-1 2l5 5h-5V4zM8 12h8v2H8v-2zm0 4h5v2H8v-2z"/></svg>`,
+  token: `<svg viewBox="0 0 24 24"><path d="M2 10.5c0-.83.67-1.5 1.5-1.5H4v5H3.5A1.5 1.5 0 012 14.5v-4z"/><path d="M5.5 8.75h14A2.25 2.25 0 0121.75 11v2A2.25 2.25 0 0119.5 15.25H5.5A2.25 2.25 0 013.25 13v-2A2.25 2.25 0 015.5 8.75z"/></svg>`,
 };
 
 function navHref(href, basePath) {
@@ -478,11 +484,11 @@ function renderCertificadosPanel(groups, navConfig, lowest, basePath) {
     <div class="mega-nav__col">
       <h3 class="mega-nav__col-title">${title}</h3>
       <ul class="mega-nav__col-links">${items.map((p) => renderNavProductLink(p, icon)).join("")}</ul>
-      ${showFooter ? `<div class="mega-nav__col-footer"><a href="${navHref("loja.html", basePath)}" data-nav="loja">Ver todos os certificados</a></div>` : ""}
+      ${showFooter ? `<div class="mega-nav__col-footer"><a href="${navHref("loja.html", basePath)}" data-nav="loja">Ver toda a loja</a></div>` : ""}
     </div>`;
 
   return `
-    <div id="mega-panel-certificados" class="mega-nav__panel" role="region" aria-label="Certificados" hidden>
+    <div id="mega-panel-certificados" class="mega-nav__panel" role="region" aria-label="Loja" hidden>
       <div class="mega-nav__panel-inner">
         <div class="mega-nav__grid mega-nav__grid--cert">
           ${col("Pessoa física", groups.ecpf, "user", false)}
@@ -546,7 +552,7 @@ function renderSuportePanel(navConfig, basePath) {
   const promoHtml = renderPromoAside({ ...promo, cta: promo.cta || "Iniciar conversa" }, { whatsappHref });
 
   return `
-    <div id="mega-panel-suporte" class="mega-nav__panel" role="region" aria-label="Suporte" hidden>
+    <div id="mega-panel-suporte" class="mega-nav__panel" role="region" aria-label="Contato" hidden>
       <div class="mega-nav__panel-inner">
         <div class="mega-nav__grid mega-nav__grid--duo">
           <div class="mega-nav__col">
@@ -571,21 +577,21 @@ function renderMegaNav(navConfig, products, basePath) {
     <ul class="mega-nav__list">
       <li><a href="${navHref("index.html", basePath)}" class="mega-nav__link" data-nav="home">Início</a></li>
       <li class="mega-nav__item" data-mega="certificados">
-        <button type="button" class="mega-nav__trigger" aria-expanded="false" aria-controls="mega-panel-certificados" data-nav="loja">
-          Certificados ${NAV_CHEVRON}
+        <button type="button" class="mega-nav__trigger" aria-expanded="false" aria-controls="mega-panel-certificados" data-nav="loja" title="Clique duas vezes para abrir a loja">
+          Loja ${NAV_CHEVRON}
         </button>
         ${renderCertificadosPanel(groups, navConfig, lowest, basePath)}
       </li>
       <li><a href="${navHref("quem-somos.html", basePath)}" class="mega-nav__link" data-nav="quem-somos">Quem Somos</a></li>
       <li class="mega-nav__item" data-mega="parcerias">
-        <button type="button" class="mega-nav__trigger" aria-expanded="false" aria-controls="mega-panel-parcerias" data-nav="seja-parceiro">
+        <button type="button" class="mega-nav__trigger" aria-expanded="false" aria-controls="mega-panel-parcerias" data-nav="seja-parceiro" title="Clique duas vezes para abrir parcerias">
           Parcerias ${NAV_CHEVRON}
         </button>
         ${renderParceriasPanel(navConfig, basePath)}
       </li>
       <li class="mega-nav__item" data-mega="suporte">
-        <button type="button" class="mega-nav__trigger" aria-expanded="false" aria-controls="mega-panel-suporte" data-nav="contato">
-          Suporte ${NAV_CHEVRON}
+        <button type="button" class="mega-nav__trigger" aria-expanded="false" aria-controls="mega-panel-suporte" data-nav="contato" title="Clique duas vezes para abrir contato">
+          Contato ${NAV_CHEVRON}
         </button>
         ${renderSuportePanel(navConfig, basePath)}
       </li>
@@ -630,6 +636,12 @@ function closeAllMegaItems() {
   document.querySelectorAll(".mega-nav__item.is-open").forEach(closeMegaItem);
 }
 
+const MEGA_NAV_LANDING = {
+  certificados: "loja.html",
+  parcerias: "seja-parceiro.html",
+  suporte: "contato.html",
+};
+
 function initMegaNavA11y(nav) {
   const triggers = [...nav.querySelectorAll(".mega-nav__trigger")];
 
@@ -650,6 +662,15 @@ function initMegaNavA11y(nav) {
         delete item.dataset.suppressHover;
         openMegaItem(item);
       }
+    });
+
+    trigger.addEventListener("dblclick", (e) => {
+      e.preventDefault();
+      e.stopPropagation();
+      const landing = MEGA_NAV_LANDING[item.dataset.mega];
+      if (!landing) return;
+      closeAllMegaItems();
+      window.location.assign(navHref(landing, getBasePath()));
     });
 
     trigger.addEventListener("keydown", (e) => {
@@ -823,7 +844,7 @@ async function initMegaNav() {
         <li><a href="${navHref("loja.html", getBasePath())}" class="mega-nav__link" data-nav="loja">Loja</a></li>
         <li><a href="${navHref("quem-somos.html", getBasePath())}" class="mega-nav__link" data-nav="quem-somos">Quem Somos</a></li>
         <li><a href="${navHref("seja-parceiro.html", getBasePath())}" class="mega-nav__link" data-nav="seja-parceiro">Parcerias</a></li>
-        <li><a href="${navHref("contato.html", getBasePath())}" class="mega-nav__link" data-nav="contato">Suporte</a></li>
+        <li><a href="${navHref("contato.html", getBasePath())}" class="mega-nav__link" data-nav="contato">Contato</a></li>
       </ul>`;
     setActiveNav();
     setupMobileDrawer(nav);
@@ -1089,6 +1110,673 @@ async function initPersonaCards() {
   container.innerHTML = section.items.map((persona) => renderPersonaCard(persona, basePath)).join("");
 }
 
+const DEFAULT_ACQUISITION_STEPS = {
+  title: "Como funciona a aquisição?",
+  subtitle: "Entenda em poucos passos e siga para a compra com segurança",
+  items: [
+    {
+      title: "Escolha o certificado",
+      description: "e-CPF ou e-CNPJ, A1 em arquivo ou A3 em token/mídia.",
+      icon: "certificate",
+    },
+    {
+      title: "Compre com segurança",
+      description: "Pix, parcelamento em até 3x e preço transparente na hora.",
+      icon: "cart",
+    },
+    {
+      title: "Valide sua identidade",
+      description: "Videoconferência ou validação presencial, conforme o certificado.",
+      icon: "videocam",
+    },
+    {
+      title: "Receba a emissão",
+      description: "Certificado ICP-Brasil com validade jurídica reconhecida.",
+      icon: "shield-check",
+    },
+    {
+      title: "Instale e use",
+      description: "IR, NF-e, gov.br, assinaturas digitais e muito mais.",
+      icon: "download",
+    },
+  ],
+};
+
+function acquisitionStepIcon(name) {
+  return NAV_ICONS[name] || NAV_ICONS.certificate;
+}
+
+function renderAcquisitionStep(step, index) {
+  return `
+    <li class="acquisition-step" style="--step-index: ${index}">
+      <div class="acquisition-step__card">
+        <span class="acquisition-step__icon" aria-hidden="true">${acquisitionStepIcon(step.icon)}</span>
+        <div class="acquisition-step__body">
+          <span class="acquisition-step__num" aria-hidden="true">${index + 1}</span>
+          <h3 class="acquisition-step__title">${step.title}</h3>
+          <p class="acquisition-step__desc">${step.description}</p>
+        </div>
+      </div>
+    </li>`;
+}
+
+function initScrollReveal() {
+  const blocks = document.querySelectorAll(".js-reveal");
+  if (!blocks.length) return;
+
+  const prefersReduced = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+  if (prefersReduced) {
+    blocks.forEach((el) => el.classList.add("is-visible"));
+    return;
+  }
+
+  const observer = new IntersectionObserver(
+    (entries) => {
+      entries.forEach((entry) => {
+        if (entry.isIntersecting) {
+          entry.target.classList.add("is-visible");
+          observer.unobserve(entry.target);
+        }
+      });
+    },
+    { threshold: 0.15, rootMargin: "0px 0px -6% 0px" }
+  );
+
+  blocks.forEach((el) => observer.observe(el));
+}
+
+async function initAcquisitionSteps() {
+  const track = document.getElementById("acquisition-steps");
+  if (!track) return;
+
+  let section = DEFAULT_ACQUISITION_STEPS;
+  try {
+    const config = await loadSiteConfig();
+    if (config.acquisitionSteps?.items?.length) section = config.acquisitionSteps;
+  } catch {
+    /* fallback */
+  }
+
+  const headerEl = document.getElementById("acquisition-header");
+
+  if (headerEl) {
+    headerEl.innerHTML = `
+      <h2 id="acquisition-title">${section.title}</h2>
+      <p>${section.subtitle}</p>
+      <div class="section-divider"></div>`;
+  }
+
+  track.innerHTML = section.items.map((step, i) => renderAcquisitionStep(step, i)).join("");
+}
+
+const DEFAULT_MODEL_COMPARE = {
+  title: "A1 ou A3: qual escolher?",
+  subtitle: "Compare os modelos e escolha o melhor para o seu caso",
+  models: {
+    a1: {
+      name: "A1",
+      tagline: "Em arquivo",
+      icon: "file",
+      highlights: [
+        "Instalado no computador ou servidor",
+        "Mais prático para uso em um único equipamento",
+        "Geralmente mais acessível",
+      ],
+    },
+    a3: {
+      name: "A3",
+      tagline: "Token / mídia",
+      icon: "token",
+      highlights: [
+        "Chave privada nunca sai do dispositivo",
+        "Maior segurança física contra cópia",
+        "Uso em diferentes computadores",
+      ],
+    },
+  },
+  rows: [
+    {
+      label: "Vantagens",
+      a1: "Instalação simples, ideal para quem usa sempre o mesmo PC. Renovação rápida com novo arquivo digital.",
+      a3: "Proteção reforçada: a chave fica guardada no token ou cartão. Indicado para quem assina com frequência ou em vários locais.",
+    },
+    {
+      label: "Durabilidade",
+      a1: "Validade contratual de <strong>1, 2 ou 3 anos</strong>. Ao vencer, é necessário emitir um novo certificado.",
+      a3: "Validade contratual de <strong>1, 2 ou 3 anos</strong>, com mídia criptográfica de longa vida útil — a chave permanece no dispositivo.",
+    },
+    {
+      label: "Armazenamento",
+      a1: "Arquivo digital no computador. Exige <strong>backup seguro</strong> da senha e do certificado.",
+      a3: "Token USB, cartão inteligente ou leitora. Dispositivo <strong>físico e portátil</strong>.",
+    },
+    {
+      label: "Uso recomendado",
+      a1: "Pessoa física, MEI ou empresa com uso em <strong>um único equipamento</strong> e que prioriza praticidade.",
+      a3: "Empresas, contadores e profissionais que precisam de <strong>mais segurança</strong> ou usam o certificado em vários computadores.",
+    },
+  ],
+};
+
+function modelCompareIcon(name) {
+  return NAV_ICONS[name] || NAV_ICONS.certificate;
+}
+
+function renderModelCompareCard(model, variant) {
+  const highlights = (model.highlights || [])
+    .map((item) => `<li>${item}</li>`)
+    .join("");
+
+  return `
+    <article class="model-compare__card model-compare__card--${variant}">
+      <div class="model-compare__card-head">
+        <span class="model-compare__icon" aria-hidden="true">${modelCompareIcon(model.icon)}</span>
+        <div>
+          <h3 class="model-compare__card-title">${model.name}</h3>
+          <p class="model-compare__card-tagline">${model.tagline}</p>
+        </div>
+      </div>
+      <ul class="model-compare__highlights">${highlights}</ul>
+    </article>`;
+}
+
+function renderModelCompareTable(rows, models) {
+  const body = rows
+    .map(
+      (row) => `
+    <tr>
+      <th scope="row">${row.label}</th>
+      <td data-col="a1">${row.a1}</td>
+      <td data-col="a3">${row.a3}</td>
+    </tr>`
+    )
+    .join("");
+
+  return `
+    <div class="model-compare__table-wrap">
+      <table class="model-compare__table">
+        <thead>
+          <tr>
+            <th scope="col">Critério</th>
+            <th scope="col">${models.a1.name} — ${models.a1.tagline}</th>
+            <th scope="col">${models.a3.name} — ${models.a3.tagline}</th>
+          </tr>
+        </thead>
+        <tbody>${body}</tbody>
+      </table>
+    </div>`;
+}
+
+async function initModelCompare() {
+  const container = document.getElementById("model-compare");
+  if (!container) return;
+
+  let section = DEFAULT_MODEL_COMPARE;
+  try {
+    const config = await loadSiteConfig();
+    if (config.modelCompare?.rows?.length) section = config.modelCompare;
+  } catch {
+    /* fallback */
+  }
+
+  const headerEl = document.getElementById("model-compare-header");
+  if (headerEl) {
+    headerEl.innerHTML = `
+      <h2 id="model-compare-title">${section.title}</h2>
+      <p>${section.subtitle}</p>
+      <div class="section-divider"></div>`;
+  }
+
+  container.innerHTML = `
+    <div class="model-compare__intro">
+      ${renderModelCompareCard(section.models.a1, "a1")}
+      <span class="model-compare__vs" aria-hidden="true">VS</span>
+      ${renderModelCompareCard(section.models.a3, "a3")}
+    </div>
+    ${renderModelCompareTable(section.rows, section.models)}`;
+}
+
+const REVIEW_SOURCE_LABELS = {
+  google: "Ver no Google",
+  facebook: "Ver no Facebook",
+};
+
+const REVIEW_SOURCE_ICONS = {
+  google: `<svg viewBox="0 0 24 24" aria-hidden="true"><path d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92a5.06 5.06 0 01-2.2 3.32v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.1z" fill="#4285F4"/><path d="M12 23c2.97 0 5.46-.98 7.28-2.66l-3.57-2.77c-.98.66-2.23 1.06-3.71 1.06-2.86 0-5.29-1.93-6.16-4.53H2.18v2.84C3.99 20.53 7.7 23 12 23z" fill="#34A853"/><path d="M5.84 14.09c-.22-.66-.35-1.36-.35-2.09s.13-1.43.35-2.09V7.07H2.18C1.43 8.55 1 10.22 1 12s.43 3.45 1.18 4.93l2.85-2.22.81-.62z" fill="#FBBC05"/><path d="M12 5.38c1.62 0 3.06.56 4.21 1.64l3.15-3.15C17.45 2.09 14.97 1 12 1 7.7 1 3.99 3.47 2.18 7.07l3.66 2.84c.87-2.6 3.3-4.53 6.16-4.53z" fill="#EA4335"/></svg>`,
+  facebook: `<svg viewBox="0 0 24 24" aria-hidden="true"><path d="M13 3h4a1 1 0 011 1v3h-3a2 2 0 00-2 2v3h5l-1 4h-4v8h-4v-8H7v-4h4V8a5 5 0 015-5z"/></svg>`,
+};
+
+const DEFAULT_REVIEWS = {
+  title: "O que nossos clientes dizem",
+  subtitle: "Avaliações reais de quem já emitiu certificado digital conosco",
+  autoplayMs: 6000,
+  items: [],
+};
+
+function reviewInitials(name) {
+  return name
+    .split(" ")
+    .filter(Boolean)
+    .slice(0, 2)
+    .map((part) => part[0])
+    .join("")
+    .toUpperCase();
+}
+
+function renderReviewStars(rating) {
+  const stars = [];
+  for (let i = 1; i <= 5; i++) {
+    stars.push(`<svg class="review-card__star${i <= rating ? " is-filled" : ""}" viewBox="0 0 24 24" aria-hidden="true"><path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z"/></svg>`);
+  }
+  return `<div class="review-card__stars" aria-label="${rating} de 5 estrelas">${stars.join("")}</div>`;
+}
+
+function renderReviewAvatar(review) {
+  const initials = reviewInitials(review.name);
+  if (!review.photo) {
+    return `<span class="review-card__avatar review-card__avatar--fallback" aria-hidden="true">${initials}</span>`;
+  }
+  return `<img class="review-card__avatar" src="${review.photo}" alt="" loading="lazy">`;
+}
+
+function renderReviewCard(review) {
+  const source = review.source || "google";
+  const sourceUrl = review.sourceUrl || "#";
+  const sourceLabel = REVIEW_SOURCE_LABELS[source] || "Ver avaliação";
+
+  return `
+    <article class="review-card">
+      <div class="review-card__top">
+        ${renderReviewAvatar(review)}
+        <div class="review-card__meta">
+          <h3 class="review-card__name">${review.name}</h3>
+          ${review.date ? `<p class="review-card__date">${review.date}</p>` : ""}
+          ${renderReviewStars(review.rating || 5)}
+        </div>
+      </div>
+      <p class="review-card__text">${review.text}</p>
+      <footer class="review-card__footer">
+        <a href="${sourceUrl}" class="review-card__source review-card__source--${source}" target="_blank" rel="noopener noreferrer">
+          ${REVIEW_SOURCE_ICONS[source] || REVIEW_SOURCE_ICONS.google}
+          ${sourceLabel}
+        </a>
+      </footer>
+    </article>`;
+}
+
+function getReviewsSlidesPerView() {
+  if (window.matchMedia("(min-width: 1100px)").matches) return 3;
+  if (window.matchMedia("(min-width: 768px)").matches) return 2;
+  return 1;
+}
+
+function initReviewsCarouselControls(root, slideCount, autoplayMs) {
+  const track = root.querySelector(".reviews-carousel__track");
+  const dotsEl = root.querySelector(".reviews-carousel__dots");
+  const prevBtn = root.querySelector(".reviews-carousel__btn--prev");
+  const nextBtn = root.querySelector(".reviews-carousel__btn--next");
+  if (!track || !dotsEl || !prevBtn || !nextBtn) return;
+
+  let currentIndex = 0;
+  let autoplayTimer;
+
+  function slidesPerView() {
+    return getReviewsSlidesPerView();
+  }
+
+  function pageCount() {
+    return Math.max(1, slideCount - slidesPerView() + 1);
+  }
+
+  function goTo(index) {
+    const pages = pageCount();
+    currentIndex = ((index % pages) + pages) % pages;
+    const offset = (currentIndex * 100) / slidesPerView();
+    track.style.transform = `translateX(-${offset}%)`;
+
+    dotsEl.querySelectorAll(".reviews-carousel__dot").forEach((dot, i) => {
+      dot.classList.toggle("is-active", i === currentIndex);
+      dot.setAttribute("aria-selected", i === currentIndex ? "true" : "false");
+    });
+
+    const singlePage = pages <= 1;
+    prevBtn.disabled = singlePage;
+    nextBtn.disabled = singlePage;
+  }
+
+  function renderDots() {
+    dotsEl.innerHTML = "";
+    for (let i = 0; i < pageCount(); i++) {
+      const dot = document.createElement("button");
+      dot.type = "button";
+      dot.className = `reviews-carousel__dot${i === currentIndex ? " is-active" : ""}`;
+      dot.setAttribute("role", "tab");
+      dot.setAttribute("aria-label", `Avaliação ${i + 1}`);
+      dot.setAttribute("aria-selected", i === currentIndex ? "true" : "false");
+      dot.addEventListener("click", () => {
+        stopAutoplay();
+        goTo(i);
+        startAutoplay();
+      });
+      dotsEl.appendChild(dot);
+    }
+  }
+
+  function stopAutoplay() {
+    if (autoplayTimer) clearInterval(autoplayTimer);
+  }
+
+  function startAutoplay() {
+    stopAutoplay();
+    if (!autoplayMs || slideCount <= slidesPerView()) return;
+    autoplayTimer = setInterval(() => {
+      const pages = pageCount();
+      goTo(currentIndex >= pages - 1 ? 0 : currentIndex + 1);
+    }, autoplayMs);
+  }
+
+  function refresh() {
+    renderDots();
+    goTo(Math.min(currentIndex, pageCount() - 1));
+  }
+
+  prevBtn.addEventListener("click", () => {
+    stopAutoplay();
+    goTo(currentIndex - 1);
+    startAutoplay();
+  });
+
+  nextBtn.addEventListener("click", () => {
+    stopAutoplay();
+    goTo(currentIndex + 1);
+    startAutoplay();
+  });
+
+  root.addEventListener("mouseenter", stopAutoplay);
+  root.addEventListener("mouseleave", startAutoplay);
+  root.addEventListener("focusin", stopAutoplay);
+  root.addEventListener("focusout", (e) => {
+    if (!root.contains(e.relatedTarget)) startAutoplay();
+  });
+
+  window.addEventListener("resize", refresh);
+  refresh();
+  startAutoplay();
+}
+
+async function initReviewsCarousel() {
+  const root = document.getElementById("reviews-carousel");
+  if (!root || document.body.dataset.page !== "home") return;
+
+  let section = DEFAULT_REVIEWS;
+  try {
+    const config = await loadSiteConfig();
+    if (config.reviews?.items?.length) section = config.reviews;
+  } catch {
+    /* fallback */
+  }
+
+  if (!section.items.length) {
+    root.closest(".section-reviews")?.remove();
+    return;
+  }
+
+  const headerEl = document.getElementById("reviews-header");
+  if (headerEl) {
+    headerEl.innerHTML = `
+      <h2 id="reviews-title">${section.title}</h2>
+      <p>${section.subtitle}</p>
+      <div class="section-divider"></div>`;
+  }
+
+  const track = document.getElementById("reviews-track");
+  track.innerHTML = section.items
+    .map(
+      (review) => `
+    <div class="reviews-carousel__slide">
+      ${renderReviewCard(review)}
+    </div>`
+    )
+    .join("");
+
+  initReviewsCarouselControls(root, section.items.length, section.autoplayMs || 6000);
+}
+
+const DEFAULT_FAQ = {
+  title: "Perguntas frequentes",
+  subtitle: "Busque sua dúvida e encontre a resposta na hora — sem precisar falar com o atendimento",
+  searchPlaceholder: "Digite sua dúvida...",
+  categories: [{ id: "all", label: "Todas" }],
+  items: [],
+};
+
+function normalizeFaqText(value) {
+  return (value || "")
+    .toLowerCase()
+    .normalize("NFD")
+    .replace(/[\u0300-\u036f]/g, "");
+}
+
+function faqMatchesQuery(item, query) {
+  if (!query) return true;
+  const haystack = normalizeFaqText(`${item.question} ${item.answer}`);
+  const terms = normalizeFaqText(query).split(/\s+/).filter(Boolean);
+  return terms.every((term) => haystack.includes(term));
+}
+
+function highlightFaqMatch(text, query) {
+  if (!query) return text;
+  const terms = normalizeFaqText(query).split(/\s+/).filter(Boolean);
+  let result = text;
+  terms.forEach((term) => {
+    const re = new RegExp(`(${term.replace(/[.*+?^${}()|[\]\\]/g, "\\$&")})`, "gi");
+    result = result.replace(re, "<mark>$1</mark>");
+  });
+  return result;
+}
+
+function renderFaqItem(item, isOpen) {
+  return `
+    <article class="faq-item${isOpen ? " is-open" : ""}" id="faq-${item.id}" data-faq-id="${item.id}" data-faq-category="${item.category}">
+      <button type="button" class="faq-item__trigger" aria-expanded="${isOpen ? "true" : "false"}" aria-controls="faq-panel-${item.id}">
+        <span>${item.question}</span>
+        <span class="faq-item__icon" aria-hidden="true">
+          <svg viewBox="0 0 24 24"><path d="M7 10l5 5 5-5z"/></svg>
+        </span>
+      </button>
+      <div class="faq-item__panel" id="faq-panel-${item.id}" role="region" aria-labelledby="faq-${item.id}">
+        <div class="faq-item__panel-inner">
+          <p class="faq-item__answer">${item.answer}</p>
+        </div>
+      </div>
+    </article>`;
+}
+
+function injectFaqSchema(items) {
+  let el = document.getElementById("faq-schema");
+  if (!el) {
+    el = document.createElement("script");
+    el.id = "faq-schema";
+    el.type = "application/ld+json";
+    document.head.appendChild(el);
+  }
+  el.textContent = JSON.stringify({
+    "@context": "https://schema.org",
+    "@type": "FAQPage",
+    mainEntity: items.map((item) => ({
+      "@type": "Question",
+      name: item.question,
+      acceptedAnswer: {
+        "@type": "Answer",
+        text: item.answer,
+      },
+    })),
+  });
+}
+
+async function initFaqSection() {
+  const listEl = document.getElementById("faq-list");
+  if (!listEl || document.body.dataset.page !== "home") return;
+
+  let section = DEFAULT_FAQ;
+  try {
+    const config = await loadSiteConfig();
+    if (config.faq?.items?.length) section = config.faq;
+  } catch {
+    /* fallback */
+  }
+
+  if (!section.items.length) {
+    listEl.closest(".section-faq")?.remove();
+    return;
+  }
+
+  const headerEl = document.getElementById("faq-header");
+  const searchEl = document.getElementById("faq-search");
+  const suggestionsEl = document.getElementById("faq-suggestions");
+  const categoriesEl = document.getElementById("faq-categories");
+  const emptyEl = document.getElementById("faq-empty");
+
+  if (headerEl) {
+    headerEl.innerHTML = `
+      <h2 id="faq-title">${section.title}</h2>
+      <p>${section.subtitle}</p>
+      <div class="section-divider"></div>`;
+  }
+
+  if (searchEl) searchEl.placeholder = section.searchPlaceholder || DEFAULT_FAQ.searchPlaceholder;
+
+  injectFaqSchema(section.items);
+
+  let activeCategory = "all";
+  let activeQuery = "";
+  let openId = null;
+
+  const categories = section.categories?.length
+    ? section.categories
+    : [{ id: "all", label: "Todas" }];
+
+  function filteredItems() {
+    return section.items.filter((item) => {
+      const categoryMatch = activeCategory === "all" || item.category === activeCategory;
+      return categoryMatch && faqMatchesQuery(item, activeQuery);
+    });
+  }
+
+  function renderList() {
+    const items = filteredItems();
+    listEl.innerHTML = items.map((item) => renderFaqItem(item, item.id === openId)).join("");
+    emptyEl.hidden = items.length > 0;
+
+    listEl.querySelectorAll(".faq-item__trigger").forEach((btn) => {
+      btn.addEventListener("click", () => {
+        const itemEl = btn.closest(".faq-item");
+        const id = itemEl?.dataset.faqId;
+        openId = openId === id ? null : id;
+        renderList();
+      });
+    });
+  }
+
+  function renderCategories() {
+    categoriesEl.innerHTML = categories
+      .map(
+        (cat) => `
+      <button type="button" class="faq-category${cat.id === activeCategory ? " is-active" : ""}" role="tab" aria-selected="${cat.id === activeCategory ? "true" : "false"}" data-faq-category="${cat.id}">
+        ${cat.label}
+      </button>`
+      )
+      .join("");
+
+    categoriesEl.querySelectorAll(".faq-category").forEach((btn) => {
+      btn.addEventListener("click", () => {
+        activeCategory = btn.dataset.faqCategory;
+        openId = null;
+        renderCategories();
+        renderList();
+        hideSuggestions();
+      });
+    });
+  }
+
+  function hideSuggestions() {
+    suggestionsEl.hidden = true;
+    suggestionsEl.innerHTML = "";
+  }
+
+  function showSuggestions(query) {
+    if (!query.trim()) {
+      hideSuggestions();
+      return;
+    }
+
+    const matches = section.items
+      .filter((item) => faqMatchesQuery(item, query))
+      .slice(0, 5);
+
+    if (!matches.length) {
+      hideSuggestions();
+      return;
+    }
+
+    suggestionsEl.innerHTML = matches
+      .map(
+        (item) => `
+      <li role="presentation">
+        <button type="button" class="faq-suggestions__item" role="option" data-faq-suggestion="${item.id}">
+          ${highlightFaqMatch(item.question, query)}
+        </button>
+      </li>`
+      )
+      .join("");
+    suggestionsEl.hidden = false;
+
+    suggestionsEl.querySelectorAll("[data-faq-suggestion]").forEach((btn) => {
+      btn.addEventListener("click", () => {
+        const id = btn.dataset.faqSuggestion;
+        const item = section.items.find((i) => i.id === id);
+        if (!item) return;
+        activeQuery = item.question;
+        searchEl.value = item.question;
+        activeCategory = "all";
+        openId = id;
+        renderCategories();
+        renderList();
+        hideSuggestions();
+        document.getElementById(`faq-${id}`)?.scrollIntoView({ behavior: "smooth", block: "center" });
+      });
+    });
+  }
+
+  searchEl?.addEventListener("input", () => {
+    activeQuery = searchEl.value;
+    openId = null;
+    renderList();
+    showSuggestions(activeQuery);
+  });
+
+  searchEl?.addEventListener("keydown", (e) => {
+    if (e.key === "Escape") {
+      hideSuggestions();
+      return;
+    }
+    if (e.key === "Enter") {
+      const first = suggestionsEl.querySelector("[data-faq-suggestion]");
+      if (first && !suggestionsEl.hidden) {
+        e.preventDefault();
+        first.click();
+      }
+    }
+  });
+
+  document.addEventListener("click", (e) => {
+    if (!e.target.closest(".faq-search")) hideSuggestions();
+  });
+
+  renderCategories();
+  renderList();
+}
+
 const QUOTE_TYPE_LABELS = { ecpf: "e-CPF", ecnpj: "e-CNPJ" };
 const QUOTE_VARIANT_LABELS = {
   token: "Token USB",
@@ -1211,15 +1899,19 @@ async function initCertificateQuoter() {
   updateQuote();
 }
 
-document.addEventListener("DOMContentLoaded", () => {
+document.addEventListener("DOMContentLoaded", async () => {
   initMegaNav().then(() => {
     initMobileMenu();
   });
   initContactForm();
   initHeroHome();
   initPersonaCards();
+  await initAcquisitionSteps();
+  await initModelCompare();
+  await initFaqSection();
+  await initReviewsCarousel();
+  initScrollReveal();
   initCertificateQuoter();
-  renderProductGrid("#products-home", 8);
   renderProductGrid("#products-shop");
   renderProductDetail();
 });
