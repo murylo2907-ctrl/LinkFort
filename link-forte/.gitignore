@@ -1,3 +1,5 @@
 node_modules/
 .DS_Store
 site/assets/js/supabase-config.js
+
+.vercel

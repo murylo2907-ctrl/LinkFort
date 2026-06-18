@@ -1,0 +1,9 @@
+{
+  "buildCommand": "node scripts/prepare-deploy.mjs",
+  "outputDirectory": "site",
+  "installCommand": "",
+  "framework": null,
+  "rewrites": [
+    { "source": "/parceiro", "destination": "/parceiro/login.html" }
+  ]
+}

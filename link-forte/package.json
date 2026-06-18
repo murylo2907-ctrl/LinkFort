@@ -5,7 +5,10 @@
   "description": "Réplica estática do site linkforte.com.br extraída via API pública WordPress/WooCommerce",
   "scripts": {
     "build": "node scripts/build.mjs",
+    "build:deploy": "node scripts/prepare-deploy.mjs",
     "dev": "npx --yes serve site -l 3000",
-    "serve": "npx --yes serve site -l 3000"
+    "serve": "npx --yes serve site -l 3000",
+    "deploy": "node scripts/prepare-deploy.mjs && npx vercel --prod --yes",
+    "deploy:dev": "npm run build && node scripts/prepare-deploy.mjs && npx vercel --yes"
   }
 }
