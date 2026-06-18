@@ -1,0 +1,42 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Materiais | Portal do Parceiro | Link Forte</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Raleway:wght@400;600;700;800&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="../assets/css/style.css">
+  <link rel="stylesheet" href="../assets/css/parceiro.css">
+  <link rel="icon" href="../assets/images/LINKFORTE-vetor.png">
+</head>
+<body class="portal-body">
+  <div class="portal-layout">
+    <aside class="portal-sidebar">
+      <div class="portal-sidebar__brand">
+        <a href="../index.html"><img src="../assets/images/LINKFORTE-vetor.png" alt="Link Forte"></a>
+      </div>
+      <nav id="portal-nav" class="portal-nav" aria-label="Menu do portal"></nav>
+      <div class="portal-sidebar__footer">
+        <a href="#" id="logout-btn" class="btn btn-outline" style="width:100%">Sair</a>
+      </div>
+    </aside>
+    <div class="portal-main">
+      <header class="portal-header">
+        <div>
+          <h1>Materiais de divulgação</h1>
+          <p>Baixe banners, textos e apresentações para divulgar a Link Forte</p>
+        </div>
+      </header>
+      <div id="materials-alert" class="portal-alert portal-alert--error" hidden></div>
+      <div id="materials-grid" class="portal-materials"></div>
+    </div>
+  </div>
+  <script>window.PORTAL_BASE = "../";</script>
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+  <script src="../assets/js/supabase-config.js"></script>
+  <script src="../assets/js/parceiro-auth.js"></script>
+  <script src="../assets/js/parceiro-materiais.js"></script>
+</body>
+</html>

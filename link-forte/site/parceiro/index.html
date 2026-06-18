@@ -1,0 +1,87 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Dashboard | Portal do Parceiro | Link Forte</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Raleway:wght@400;600;700;800&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="../assets/css/style.css">
+  <link rel="stylesheet" href="../assets/css/parceiro.css">
+  <link rel="icon" href="../assets/images/LINKFORTE-vetor.png">
+</head>
+<body class="portal-body">
+  <div class="portal-layout">
+    <aside class="portal-sidebar">
+      <div class="portal-sidebar__brand">
+        <a href="../index.html"><img src="../assets/images/LINKFORTE-vetor.png" alt="Link Forte"></a>
+      </div>
+      <nav id="portal-nav" class="portal-nav" aria-label="Menu do portal"></nav>
+      <div class="portal-sidebar__footer">
+        <a href="#" id="logout-btn" class="btn btn-outline" style="width:100%">Sair</a>
+      </div>
+    </aside>
+    <div class="portal-main">
+      <header class="portal-header">
+        <div>
+          <h1>Olá, <span id="user-name">Parceiro</span></h1>
+          <p>Acompanhe suas indicações e seu link exclusivo</p>
+        </div>
+      </header>
+
+      <div id="dashboard-alert" class="portal-alert portal-alert--error" hidden></div>
+
+      <div class="portal-stats">
+        <div class="portal-stat"><span>Total de indicações</span><strong id="stat-total">0</strong></div>
+        <div class="portal-stat"><span>Ganhos pendentes</span><strong id="stat-pending">R$ 0,00</strong></div>
+        <div class="portal-stat"><span>Ganhos pagos</span><strong id="stat-paid">R$ 0,00</strong></div>
+      </div>
+
+      <section class="portal-card">
+        <h2>Seu link de indicação</h2>
+        <p style="color:var(--text-muted);margin-bottom:1rem">Compartilhe este link. Quando o cliente comprar, a indicação será vinculada a você.</p>
+        <div class="portal-link-box">
+          <input type="text" id="referral-link" readonly aria-label="Link de indicação">
+          <button type="button" class="btn btn-primary" id="copy-link-btn">Copiar link</button>
+        </div>
+      </section>
+
+      <section class="portal-card">
+        <h2>Meus dados</h2>
+        <div class="portal-grid-2">
+          <p><strong>Código:</strong> <span id="partner-code">—</span></p>
+          <p><strong>Tipo:</strong> <span id="partner-type">—</span></p>
+          <p><strong>E-mail:</strong> <span id="partner-email">—</span></p>
+          <p><strong>Telefone:</strong> <span id="partner-phone">—</span></p>
+          <p><strong>Empresa:</strong> <span id="partner-company">—</span></p>
+        </div>
+      </section>
+
+      <section class="portal-card">
+        <h2>Relatório de indicações</h2>
+        <div class="portal-table-wrap">
+          <table class="portal-table">
+            <thead>
+              <tr>
+                <th>Data</th>
+                <th>Cliente</th>
+                <th>Produto</th>
+                <th>Venda</th>
+                <th>Comissão</th>
+                <th>Status</th>
+              </tr>
+            </thead>
+            <tbody id="referrals-body"></tbody>
+          </table>
+        </div>
+      </section>
+    </div>
+  </div>
+  <script>window.PORTAL_BASE = "../";</script>
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+  <script src="../assets/js/supabase-config.js"></script>
+  <script src="../assets/js/parceiro-auth.js"></script>
+  <script src="../assets/js/parceiro-dashboard.js"></script>
+</body>
+</html>

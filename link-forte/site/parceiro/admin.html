@@ -1,0 +1,125 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Administração | Portal do Parceiro | Link Forte</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Raleway:wght@400;600;700;800&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="../assets/css/style.css">
+  <link rel="stylesheet" href="../assets/css/parceiro.css">
+  <link rel="icon" href="../assets/images/LINKFORTE-vetor.png">
+</head>
+<body class="portal-body">
+  <div class="portal-layout">
+    <aside class="portal-sidebar">
+      <div class="portal-sidebar__brand">
+        <a href="../index.html"><img src="../assets/images/LINKFORTE-vetor.png" alt="Link Forte"></a>
+      </div>
+      <nav id="portal-nav" class="portal-nav" aria-label="Menu do portal"></nav>
+      <div class="portal-sidebar__footer">
+        <a href="#" id="logout-btn" class="btn btn-outline" style="width:100%">Sair</a>
+      </div>
+    </aside>
+    <div class="portal-main">
+      <header class="portal-header">
+        <div>
+          <h1>Administração</h1>
+          <p>Logado como <span id="user-name">admin</span></p>
+        </div>
+      </header>
+
+      <section class="portal-card">
+        <h2>Cadastrar parceiro</h2>
+        <p style="color:var(--text-muted);margin-bottom:1rem">
+          Preencha os dados e clique em <strong>Cadastrar parceiro</strong>.
+          O <strong>link de ativação aparece na tela</strong> em seguida — copie e envie ao parceiro (WhatsApp ou e-mail).
+        </p>
+        <div id="partner-alert" class="portal-alert portal-alert--error" hidden></div>
+        <div id="partner-success" class="portal-alert portal-alert--success" hidden></div>
+        <form id="partner-form">
+          <div class="portal-grid-2">
+            <div class="form-group">
+              <label for="full_name">Nome completo</label>
+              <input type="text" id="full_name" name="full_name" required>
+            </div>
+            <div class="form-group">
+              <label for="email">E-mail</label>
+              <input type="email" id="email" name="email" required>
+            </div>
+            <div class="form-group">
+              <label for="phone">Telefone</label>
+              <input type="tel" id="phone" name="phone">
+            </div>
+            <div class="form-group">
+              <label for="company">Empresa (opcional)</label>
+              <input type="text" id="company" name="company">
+            </div>
+            <div class="form-group">
+              <label for="partner_type">Tipo de parceria</label>
+              <select id="partner_type" name="partner_type" required>
+                <option value="indicacao">Indicação</option>
+                <option value="revenda">Revenda</option>
+                <option value="ar">Autoridade de Registro</option>
+              </select>
+            </div>
+          </div>
+          <button type="submit" class="btn btn-primary" style="margin-top:1rem">Cadastrar parceiro</button>
+        </form>
+      </section>
+
+      <section class="portal-card">
+        <h2>Registrar indicação / venda</h2>
+        <div id="referral-alert" class="portal-alert portal-alert--error" hidden></div>
+        <form id="referral-form">
+          <div class="portal-grid-2">
+            <div class="form-group">
+              <label for="referral-partner">Parceiro</label>
+              <select id="referral-partner" name="partner_id" required></select>
+            </div>
+            <div class="form-group">
+              <label for="customer_name">Cliente</label>
+              <input type="text" id="customer_name" name="customer_name" required>
+            </div>
+            <div class="form-group">
+              <label for="product_name">Produto</label>
+              <input type="text" id="product_name" name="product_name" required placeholder="ex: e-CPF A1">
+            </div>
+            <div class="form-group">
+              <label for="sale_amount">Valor da venda (R$)</label>
+              <input type="number" id="sale_amount" name="sale_amount" min="0" step="0.01" required>
+            </div>
+            <div class="form-group">
+              <label for="commission_amount">Comissão (R$)</label>
+              <input type="number" id="commission_amount" name="commission_amount" min="0" step="0.01" required>
+            </div>
+            <div class="form-group">
+              <label for="sale_date">Data da venda</label>
+              <input type="date" id="sale_date" name="sale_date" required>
+            </div>
+            <div class="form-group">
+              <label for="status">Status</label>
+              <select id="status" name="status" required>
+                <option value="pendente">Pendente</option>
+                <option value="aprovada">Aprovada</option>
+                <option value="paga">Paga</option>
+              </select>
+            </div>
+            <div class="form-group" style="grid-column:1/-1">
+              <label for="notes">Observações</label>
+              <textarea id="notes" name="notes" rows="2"></textarea>
+            </div>
+          </div>
+          <button type="submit" class="btn btn-primary" style="margin-top:1rem">Registrar indicação</button>
+        </form>
+      </section>
+    </div>
+  </div>
+  <script>window.PORTAL_BASE = "../";</script>
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+  <script src="../assets/js/supabase-config.js"></script>
+  <script src="../assets/js/parceiro-auth.js"></script>
+  <script src="../assets/js/parceiro-admin.js"></script>
+</body>
+</html>

@@ -138,7 +138,7 @@ function priceBlockHtml(product) {
 }
 
 function initProductPageInteractions(root, product) {
-  const wppUrl = `https://wa.me/${SITE.whatsapp}?text=${encodeURIComponent(`Olá! Quero comprar: ${product.name}`)}`;
+  const wppUrl = `https://wa.me/${SITE.whatsapp}?text=${encodeURIComponent(appendReferralToMessage(`Olá! Quero comprar: ${product.name}`))}`;
 
   root.querySelector(".js-wpp-buy")?.addEventListener("click", (e) => {
     e.preventDefault();
@@ -899,7 +899,7 @@ function initContactForm() {
     const data = new FormData(form);
     const nome = data.get("nome") || "";
     const msg = data.get("mensagem") || "";
-    const text = `Olá! Meu nome é ${nome}. ${msg}`;
+    const text = appendReferralToMessage(`Olá! Meu nome é ${nome}. ${msg}`);
     window.open(`https://wa.me/${SITE.whatsapp}?text=${encodeURIComponent(text)}`, "_blank");
   });
 }
@@ -991,7 +991,7 @@ function initHeroWhatsApp(message) {
 
   btn.addEventListener("click", (e) => {
     e.preventDefault();
-    const text = message || "Olá! Gostaria de falar com um especialista sobre certificado digital.";
+    const text = appendReferralToMessage(message || "Olá! Gostaria de falar com um especialista sobre certificado digital.");
     window.open(`https://wa.me/${SITE.whatsapp}?text=${encodeURIComponent(text)}`, "_blank");
   });
 }
@@ -1899,7 +1899,35 @@ async function initCertificateQuoter() {
   updateQuote();
 }
 
+function getReferralCode() {
+  try {
+    return localStorage.getItem("lf_ref") || "";
+  } catch {
+    return "";
+  }
+}
+
+function initReferralTracking() {
+  const params = new URLSearchParams(window.location.search);
+  const ref = params.get("ref");
+  if (!ref) return;
+
+  try {
+    localStorage.setItem("lf_ref", ref);
+    localStorage.setItem("lf_ref_at", String(Date.now()));
+  } catch {
+    /* ignore */
+  }
+}
+
+function appendReferralToMessage(text) {
+  const ref = getReferralCode();
+  if (!ref) return text;
+  return `${text}\n\nIndicação: ${ref}`;
+}
+
 document.addEventListener("DOMContentLoaded", async () => {
+  initReferralTracking();
   initMegaNav().then(() => {
     initMobileMenu();
   });
