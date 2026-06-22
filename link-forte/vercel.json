@@ -5,5 +5,9 @@
   "framework": null,
   "rewrites": [
     { "source": "/parceiro", "destination": "/parceiro/login.html" }
+  ],
+  "redirects": [
+    { "source": "/seja-parceiro", "destination": "/", "permanent": true },
+    { "source": "/seja-parceiro.html", "destination": "/", "permanent": true }
   ]
 }

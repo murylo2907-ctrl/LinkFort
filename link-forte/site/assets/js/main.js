@@ -500,38 +500,6 @@ function renderCertificadosPanel(groups, navConfig, lowest, basePath) {
     </div>`;
 }
 
-function renderParceriasPanel(navConfig, basePath) {
-  const section = navConfig?.parcerias || {};
-  const links = (section.links || []).map((l) => renderNavColLink(l, basePath)).join("");
-  const promo = section.promo || {
-    title: "Seja parceiro Link Forte",
-    text: "Revenda certificados digitais com suporte da nossa equipe.",
-    cta: "Quero ser parceiro",
-    href: "seja-parceiro.html",
-  };
-
-  return `
-    <div id="mega-panel-parcerias" class="mega-nav__panel" role="region" aria-label="Parcerias" hidden>
-      <div class="mega-nav__panel-inner">
-        <div class="mega-nav__grid mega-nav__grid--duo">
-          <div class="mega-nav__col">
-            <h3 class="mega-nav__col-title">Parcerias</h3>
-            <ul class="mega-nav__col-links">${links}</ul>
-          </div>
-          <div class="mega-nav__col">
-            <h3 class="mega-nav__col-title">Benefícios</h3>
-            <ul class="mega-nav__bullets">
-              <li>Comissão por venda de certificados</li>
-              <li>Suporte técnico e comercial</li>
-              <li>Material e treinamento para revenda</li>
-            </ul>
-          </div>
-          ${renderPromoAside(promo)}
-        </div>
-      </div>
-    </div>`;
-}
-
 function renderSuportePanel(navConfig, basePath) {
   const section = navConfig?.suporte || {};
   const links = section.links || [];
@@ -583,12 +551,6 @@ function renderMegaNav(navConfig, products, basePath) {
         ${renderCertificadosPanel(groups, navConfig, lowest, basePath)}
       </li>
       <li><a href="${navHref("quem-somos.html", basePath)}" class="mega-nav__link" data-nav="quem-somos">Quem Somos</a></li>
-      <li class="mega-nav__item" data-mega="parcerias">
-        <button type="button" class="mega-nav__trigger" aria-expanded="false" aria-controls="mega-panel-parcerias" data-nav="seja-parceiro" title="Clique duas vezes para abrir parcerias">
-          Parcerias ${NAV_CHEVRON}
-        </button>
-        ${renderParceriasPanel(navConfig, basePath)}
-      </li>
       <li class="mega-nav__item" data-mega="suporte">
         <button type="button" class="mega-nav__trigger" aria-expanded="false" aria-controls="mega-panel-suporte" data-nav="contato" title="Clique duas vezes para abrir contato">
           Contato ${NAV_CHEVRON}
@@ -638,7 +600,6 @@ function closeAllMegaItems() {
 
 const MEGA_NAV_LANDING = {
   certificados: "loja.html",
-  parcerias: "seja-parceiro.html",
   suporte: "contato.html",
 };
 
@@ -843,7 +804,6 @@ async function initMegaNav() {
         <li><a href="${navHref("index.html", getBasePath())}" class="mega-nav__link" data-nav="home">Início</a></li>
         <li><a href="${navHref("loja.html", getBasePath())}" class="mega-nav__link" data-nav="loja">Loja</a></li>
         <li><a href="${navHref("quem-somos.html", getBasePath())}" class="mega-nav__link" data-nav="quem-somos">Quem Somos</a></li>
-        <li><a href="${navHref("seja-parceiro.html", getBasePath())}" class="mega-nav__link" data-nav="seja-parceiro">Parcerias</a></li>
         <li><a href="${navHref("contato.html", getBasePath())}" class="mega-nav__link" data-nav="contato">Contato</a></li>
       </ul>`;
     setActiveNav();
@@ -886,7 +846,6 @@ function initContactForm() {
 
   const perfilMessages = {
     contador: "Sou contador(a) e gostaria de saber sobre emissão de certificados digitais para meus clientes.",
-    parceiro: "Tenho interesse no programa de parceria Link Forte.",
   };
   const perfil = new URLSearchParams(window.location.search).get("perfil");
   const msgField = form.querySelector('[name="mensagem"]');
@@ -1076,14 +1035,6 @@ const DEFAULT_PERSONAS = {
       cta: "Falar com especialista",
       href: "contato.html?perfil=contador",
       icon: "calculator",
-    },
-    {
-      id: "parceiro",
-      title: "Parceiro / Revenda",
-      description: "Revenda certificados digitais com suporte e operação Link Forte",
-      cta: "Quero ser parceiro",
-      href: "seja-parceiro.html",
-      icon: "handshake",
     },
   ],
 };

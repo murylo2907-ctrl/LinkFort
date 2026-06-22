@@ -10,7 +10,7 @@
     "instagram": "https://www.instagram.com/linkforte",
     "facebook": "https://www.facebook.com/linkforte"
   },
-  "scrapedAt": "2026-06-18T02:12:03.244Z",
+  "scrapedAt": "2026-06-22T23:26:21.681Z",
   "source": "https://linkforte.com.br",
   "hero": {
     "eyebrow": "Certificado Digital ICP-Brasil · Curitiba",
@@ -32,32 +32,6 @@
         "cta": "Abrir configurador",
         "href": "loja.html#cotador-certificado"
       }
-    },
-    "parcerias": {
-      "promo": {
-        "title": "Seja parceiro Link Forte",
-        "text": "Revenda certificados digitais com suporte da nossa equipe.",
-        "cta": "Quero ser parceiro",
-        "href": "seja-parceiro.html"
-      },
-      "links": [
-        {
-          "label": "Programa de parceiros",
-          "href": "seja-parceiro.html",
-          "icon": "handshake",
-          "dataNav": "seja-parceiro"
-        },
-        {
-          "label": "Vantagens para revenda",
-          "href": "seja-parceiro.html",
-          "icon": "certificate"
-        },
-        {
-          "label": "Suporte ao parceiro",
-          "href": "contato.html",
-          "icon": "headset"
-        }
-      ]
     },
     "suporte": {
       "promo": {
@@ -127,14 +101,6 @@
         "cta": "Falar com especialista",
         "href": "contato.html?perfil=contador",
         "icon": "calculator"
-      },
-      {
-        "id": "parceiro",
-        "title": "Parceiro / Revenda",
-        "description": "Revenda certificados digitais com suporte e operação Link Forte",
-        "cta": "Quero ser parceiro",
-        "href": "seja-parceiro.html",
-        "icon": "handshake"
       }
     ]
   },
