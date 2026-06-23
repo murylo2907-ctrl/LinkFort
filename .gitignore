@@ -1,6 +1,11 @@
 # Dependências locais (npm install)
 node_modules/
 
+# Variáveis de ambiente (nunca commitar chaves reais)
+.env.local
+.env*.local
+web/.env.local
+
 # Sistema / editor
 .DS_Store
 Thumbs.db
