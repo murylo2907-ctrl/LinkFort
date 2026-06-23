@@ -1,0 +1,13 @@
+{
+  "buildCommand": "node link-forte/scripts/prepare-deploy.mjs",
+  "outputDirectory": "link-forte/site",
+  "installCommand": "",
+  "framework": null,
+  "rewrites": [
+    { "source": "/parceiro", "destination": "/parceiro/login.html" }
+  ],
+  "redirects": [
+    { "source": "/seja-parceiro", "destination": "/", "permanent": true },
+    { "source": "/seja-parceiro.html", "destination": "/", "permanent": true }
+  ]
+}
