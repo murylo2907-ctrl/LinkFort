@@ -5,7 +5,8 @@
   "framework": null,
   "rewrites": [
     { "source": "/parceiro", "destination": "/parceiro/login.html" },
-    { "source": "/loja", "destination": "/loja.html" }
+    { "source": "/loja", "destination": "/loja.html" },
+    { "source": "/carrinho", "destination": "/carrinho.html" }
   ],
   "redirects": [
     { "source": "/seja-parceiro", "destination": "/", "permanent": true },

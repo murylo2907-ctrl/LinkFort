@@ -16,12 +16,13 @@ function saveCarrinho(items) {
 
 function adicionarAoCarrinho(produto) {
   const items = getCarrinho();
-  const existing = items.find((i) => i.id === produto.id);
+  const produtoId = String(produto.id);
+  const existing = items.find((i) => String(i.id) === produtoId);
   if (existing) {
     existing.quantidade += 1;
   } else {
     items.push({
-      id: produto.id,
+      id: produtoId,
       nome: produto.nome,
       tipo: produto.tipo,
       midia: produto.midia,
@@ -36,6 +37,36 @@ function adicionarAoCarrinho(produto) {
 
 function getQuantidadeCarrinho() {
   return getCarrinho().reduce((sum, i) => sum + i.quantidade, 0);
+}
+
+function removerItem(id) {
+  const items = getCarrinho().filter((i) => String(i.id) !== String(id));
+  saveCarrinho(items);
+}
+
+function alterarQuantidade(id, qty) {
+  const n = Math.floor(Number(qty));
+  if (!n || n <= 0) {
+    removerItem(id);
+    return;
+  }
+  const items = getCarrinho();
+  const item = items.find((i) => String(i.id) === String(id));
+  if (!item) return;
+  item.quantidade = Math.min(99, n);
+  saveCarrinho(items);
+}
+
+function limparCarrinho() {
+  saveCarrinho([]);
+}
+
+function getSubtotal() {
+  return getCarrinho().reduce((sum, i) => sum + i.preco * i.quantidade, 0);
+}
+
+function getTotalCarrinho() {
+  return getSubtotal();
 }
 
 function dispatchCartUpdate() {
