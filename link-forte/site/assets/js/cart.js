@@ -14,12 +14,13 @@ function saveCarrinho(items) {
   dispatchCartUpdate();
 }
 
-function adicionarAoCarrinho(produto) {
+function adicionarAoCarrinho(produto, quantidade = 1) {
+  const qty = Math.max(1, Math.min(99, Math.floor(Number(quantidade)) || 1));
   const items = getCarrinho();
   const produtoId = String(produto.id);
   const existing = items.find((i) => String(i.id) === produtoId);
   if (existing) {
-    existing.quantidade += 1;
+    existing.quantidade = Math.min(99, existing.quantidade + qty);
   } else {
     items.push({
       id: produtoId,
@@ -28,7 +29,7 @@ function adicionarAoCarrinho(produto) {
       midia: produto.midia,
       validade_anos: produto.validade_anos,
       preco: produto.preco,
-      quantidade: 1,
+      quantidade: qty,
     });
   }
   saveCarrinho(items);

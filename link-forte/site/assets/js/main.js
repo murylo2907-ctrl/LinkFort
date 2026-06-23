@@ -88,8 +88,6 @@ async function renderProductGrid(selector, limit, excludeSlug) {
   }
 }
 
-const WPP_ICON = `<svg aria-hidden="true" viewBox="0 0 448 512" width="20" height="20" fill="currentColor"><path d="M380.9 97.1C339 55.1 283.2 32 223.9 32c-122.4 0-222 99.6-222 222 0 39.1 10.2 77.3 29.6 111L0 480l117.7-30.9c32.4 17.7 68.9 27 106.1 27h.1c122.3 0 224.1-99.6 224.1-222 0-59.3-25.2-115-67.1-157zm-157 341.6c-33.2 0-65.7-8.9-94-25.7l-6.7-4-69.8 18.3L72 359.2l-4.4-7c-18.5-29.4-28.2-63.3-28.2-98.2 0-101.7 82.8-184.5 184.6-184.5 49.3 0 95.6 19.2 130.4 54.1 34.8 34.9 56.2 81.2 56.1 130.5 0 101.8-84.9 184.6-186.6 184.6zm101.2-138.2c-5.5-2.8-32.8-16.2-37.9-18-5.1-1.9-8.8-2.8-12.5 2.8-3.7 5.6-14.3 18-17.6 21.8-3.2 3.7-6.5 4.2-12 1.4-32.6-16.3-54-29.1-75.5-66-5.7-9.8 5.7-9.1 16.3-30.3 1.8-3.7.9-6.9-.5-9.7-1.4-2.8-12.5-30.1-17.1-41.2-4.5-10.8-9.1-9.3-12.5-9.5-3.2-.2-6.9-.2-10.6-.2-3.7 0-9.7 1.4-14.8 6.9-5.1 5.6-19.4 19-19.4 46.3 0 27.3 19.9 53.7 22.6 57.4 2.8 3.7 39.1 59.7 94.8 83.8 35.2 15.2 49 16.5 66.6 13.9 10.7-1.6 32.8-13.4 37.4-26.4 4.6-13 4.6-24.1 3.2-26.4-1.3-2.5-5-3.9-10.5-6.6z"/></svg>`;
-
 function parsePrice(priceMin) {
   return parseFloat(priceMin.replace(/\./g, "").replace(",", "."));
 }
@@ -137,18 +135,43 @@ function priceBlockHtml(product) {
   `;
 }
 
+function productPageToCartItem(product) {
+  const slug = (product.slug || "").toLowerCase();
+  const name = (product.name || "").toLowerCase();
+
+  let tipo = "e-CPF";
+  if (name.includes("e-cnpj") || slug.includes("e-cnpj")) tipo = "e-CNPJ";
+  else if (name.includes("médico") || name.includes("medico") || slug.includes("medico")) tipo = "e-MÉDICO";
+  else if (name.includes("advogado") || slug.includes("advogado")) tipo = "e-ADVOGADO";
+
+  let midia = "A3";
+  if (slug.includes("a1") || name.includes("a1")) midia = "A1";
+  else if (slug.includes("nuvem") || name.includes("nuvem")) midia = "Nuvem";
+
+  let validade_anos = 1;
+  const validityMatch = (product.validity || "").match(/(\d+)\s*mes/i);
+  if (validityMatch) {
+    const meses = parseInt(validityMatch[1], 10);
+    validade_anos = meses >= 36 ? 3 : meses >= 24 ? 2 : 1;
+  }
+
+  return {
+    id: product.id,
+    nome: product.name,
+    tipo,
+    midia,
+    validade_anos,
+    preco: parsePrice(product.priceMin),
+  };
+}
+
 function initProductPageInteractions(root, product) {
-  const wppUrl = `https://wa.me/${SITE.whatsapp}?text=${encodeURIComponent(appendReferralToMessage(`Olá! Quero comprar: ${product.name}`))}`;
-
-  root.querySelector(".js-wpp-buy")?.addEventListener("click", (e) => {
-    e.preventDefault();
-    window.open(wppUrl, "_blank");
-  });
-
   root.querySelector(".js-add-cart")?.addEventListener("click", (e) => {
     e.preventDefault();
     const qty = root.querySelector(".qty")?.value || "1";
-    window.open(`${wppUrl} (Quantidade: ${qty})`, "_blank");
+    if (typeof adicionarAoCarrinho === "function") {
+      adicionarAoCarrinho(productPageToCartItem(product), qty);
+    }
   });
 
   const qtyInput = root.querySelector(".qty");
@@ -262,18 +285,6 @@ async function renderProductDetail() {
                               <div class="shopengine-product-price">
                                 <p class="woo-custom-installments-price-container price">${priceBlockHtml(product)}</p>
                               </div>
-                            </div>
-                          </div>
-                        </div>
-                        <div class="elementor-element elementor-element-194d8a5 elementor-widget elementor-widget-button">
-                          <div class="elementor-widget-container">
-                            <div class="elementor-button-wrapper">
-                              <a href="#" class="elementor-button elementor-size-sm js-wpp-buy">
-                                <span class="elementor-button-content-wrapper">
-                                  <span class="elementor-button-icon">${WPP_ICON}</span>
-                                  <span class="elementor-button-text">COMPRAR PELO WPP</span>
-                                </span>
-                              </a>
                             </div>
                           </div>
                         </div>
@@ -1808,13 +1819,163 @@ function catalogProductImage(produto) {
   return byTipo[produto.midia] || byTipo.A1 || fallback;
 }
 
+function catalogPriceDisplayHtml(produto) {
+  const price = formatBRL(produto.preco);
+  const installment = formatBRL(produto.preco / 3);
+  return `
+    <div class="lf-qv-price">
+      <p class="lf-qv-price__main"><span class="amount">R$&nbsp;${price}</span></p>
+      <p class="lf-qv-price__installment">Em até 3x de <span class="amount">R$&nbsp;${installment}</span> sem juros</p>
+      <p class="lf-qv-price__pix">
+        <span class="discount-before-price">À vista</span>
+        <span class="discounted-price">R$&nbsp;${price}</span>
+        <span class="discount-after-price">no Pix</span>
+      </p>
+    </div>
+  `;
+}
+
+let catalogQuickViewEl = null;
+let catalogQuickViewPrevFocus = null;
+
+function ensureCatalogQuickViewShell() {
+  if (catalogQuickViewEl) return catalogQuickViewEl;
+
+  catalogQuickViewEl = document.createElement("div");
+  catalogQuickViewEl.className = "lf-quick-view";
+  catalogQuickViewEl.setAttribute("aria-hidden", "true");
+  catalogQuickViewEl.innerHTML = `
+    <div class="lf-quick-view__backdrop" data-qv-close></div>
+    <div class="lf-quick-view__dialog" role="dialog" aria-modal="true" aria-labelledby="lf-qv-title">
+      <button type="button" class="lf-quick-view__close" aria-label="Fechar" data-qv-close>&times;</button>
+      <div class="lf-quick-view__body"></div>
+    </div>
+  `;
+  document.body.appendChild(catalogQuickViewEl);
+
+  catalogQuickViewEl.addEventListener("click", (e) => {
+    if (e.target.closest("[data-qv-close]")) closeCatalogQuickView();
+  });
+
+  document.addEventListener("keydown", (e) => {
+    if (e.key === "Escape" && catalogQuickViewEl?.classList.contains("open")) {
+      const installmentOpen = catalogQuickViewEl.querySelector(".wci-modal.open");
+      if (installmentOpen) {
+        installmentOpen.classList.remove("open");
+      } else {
+        closeCatalogQuickView();
+      }
+    }
+  });
+
+  return catalogQuickViewEl;
+}
+
+function closeCatalogQuickView() {
+  if (!catalogQuickViewEl) return;
+  catalogQuickViewEl.classList.remove("open");
+  catalogQuickViewEl.setAttribute("aria-hidden", "true");
+  document.body.classList.remove("lf-qv-open");
+  const body = catalogQuickViewEl.querySelector(".lf-quick-view__body");
+  if (body) body.innerHTML = "";
+  catalogQuickViewPrevFocus?.focus();
+  catalogQuickViewPrevFocus = null;
+}
+
+function initCatalogQuickViewInteractions(root, produto) {
+  root.querySelector(".js-qv-add-cart")?.addEventListener("click", (e) => {
+    e.preventDefault();
+    const qty = root.querySelector(".qty")?.value || "1";
+    if (typeof adicionarAoCarrinho === "function") {
+      adicionarAoCarrinho(produto, qty);
+    }
+  });
+
+  const qtyInput = root.querySelector(".qty");
+  root.querySelector(".minus")?.addEventListener("click", () => {
+    if (qtyInput && Number(qtyInput.value) > 1) qtyInput.value = String(Number(qtyInput.value) - 1);
+  });
+  root.querySelector(".plus")?.addEventListener("click", () => {
+    if (qtyInput && Number(qtyInput.value) < 10) qtyInput.value = String(Number(qtyInput.value) + 1);
+  });
+
+  const installmentModal = root.querySelector(".wci-modal");
+  root.querySelector(".wci-open-popup")?.addEventListener("click", () => installmentModal?.classList.add("open"));
+  root.querySelector(".wci-modal__close")?.addEventListener("click", () => installmentModal?.classList.remove("open"));
+  installmentModal?.addEventListener("click", (e) => {
+    if (e.target === installmentModal) installmentModal.classList.remove("open");
+  });
+}
+
+function renderCatalogQuickViewContent(produto) {
+  const img = assetPath(catalogProductImage(produto));
+  const fallbackImg = assetPath("assets/images/LINKFORTE-vetor.png");
+  const desc = produto.descricao || "Consulte nossa equipe para mais detalhes sobre este certificado.";
+  const priceMin = formatBRL(produto.preco);
+  const meta = `${produto.midia} · ${catalogValidadeLabel(produto.validade_anos)}`;
+
+  return `
+    <div class="lf-quick-view__grid">
+      <div class="lf-quick-view__media">
+        <img src="${img}" alt="${produto.nome}" onerror="this.src='${fallbackImg}'">
+      </div>
+      <div class="lf-quick-view__details">
+        <h2 class="lf-quick-view__title" id="lf-qv-title">${produto.nome}</h2>
+        <p class="lf-quick-view__meta">${meta}</p>
+        ${catalogPriceDisplayHtml(produto)}
+        <button type="button" class="wci-open-popup"><span class="open-popup-text">Detalhes do parcelamento</span></button>
+        <div class="lf-quick-view__cart">
+          <div class="quantity-wrap both">
+            <button type="button" class="minus" aria-label="Diminuir">−</button>
+            <div class="quantity">
+              <input type="number" class="qty" value="1" min="1" max="10" aria-label="Quantidade">
+            </div>
+            <button type="button" class="plus" aria-label="Aumentar">+</button>
+          </div>
+          <button type="button" class="lf-quick-view__add-btn js-qv-add-cart">Adicionar ao carrinho</button>
+        </div>
+        <div class="lf-quick-view__tabs">
+          <h3>Descrição</h3>
+          <div class="lf-quick-view__desc">${desc}</div>
+        </div>
+      </div>
+    </div>
+    <div class="wci-modal" aria-hidden="true">
+      <div class="wci-modal__content">
+        <div class="wci-modal__header">
+          <h5>Formas de pagamento</h5>
+          <button type="button" class="wci-modal__close" aria-label="Fechar">&times;</button>
+        </div>
+        <div class="wci-modal__body">
+          <h4>Parcelas:</h4>
+          <table class="woo-custom-installments-table">
+            <tbody>${buildInstallmentTableRows(priceMin)}</tbody>
+          </table>
+        </div>
+      </div>
+    </div>
+  `;
+}
+
+function openCatalogQuickView(produto) {
+  const shell = ensureCatalogQuickViewShell();
+  const body = shell.querySelector(".lf-quick-view__body");
+  body.innerHTML = renderCatalogQuickViewContent(produto);
+  initCatalogQuickViewInteractions(body, produto);
+  catalogQuickViewPrevFocus = document.activeElement;
+  shell.classList.add("open");
+  shell.setAttribute("aria-hidden", "false");
+  document.body.classList.add("lf-qv-open");
+  shell.querySelector(".lf-quick-view__close")?.focus();
+}
+
 function catalogProductCard(produto) {
   const installment = formatBRL(produto.preco / 3);
   const desc = truncateText(produto.descricao || "");
   const img = assetPath(catalogProductImage(produto));
   const fallbackImg = assetPath("assets/images/LINKFORTE-vetor.png");
   return `
-    <article class="product-card product-card--catalog">
+    <article class="product-card product-card--catalog product-card--clickable" data-produto-id="${produto.id}">
       <div class="product-card__image">
         <img src="${img}" alt="${produto.nome}" loading="lazy" onerror="this.src='${fallbackImg}'">
       </div>
@@ -1878,12 +2039,19 @@ async function initCatalogVitrine() {
   });
 
   grid.addEventListener("click", (e) => {
-    const btn = e.target.closest(".js-catalog-add");
-    if (!btn) return;
-    const produto = produtosById.get(btn.dataset.produtoId);
-    if (produto && typeof adicionarAoCarrinho === "function") {
-      adicionarAoCarrinho(produto);
+    const addBtn = e.target.closest(".js-catalog-add");
+    if (addBtn) {
+      const produto = produtosById.get(String(addBtn.dataset.produtoId));
+      if (produto && typeof adicionarAoCarrinho === "function") {
+        adicionarAoCarrinho(produto);
+      }
+      return;
     }
+
+    const card = e.target.closest("[data-produto-id]");
+    if (!card) return;
+    const produto = produtosById.get(String(card.dataset.produtoId));
+    if (produto) openCatalogQuickView(produto);
   });
 
   setFilterActive(filter);
