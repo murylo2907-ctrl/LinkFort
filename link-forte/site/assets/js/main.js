@@ -1777,6 +1777,118 @@ async function fetchProdutosSupabase() {
   return rows.map((p) => ({ ...p, preco: parseProdutoPreco(p.preco) }));
 }
 
+const URL_TIPO_TO_FILTER = { ecpf: "e-CPF", ecnpj: "e-CNPJ" };
+
+function truncateText(text, max = 80) {
+  if (!text) return "";
+  return text.length <= max ? text : `${text.slice(0, max - 1)}…`;
+}
+
+function catalogValidadeLabel(anos) {
+  return anos === 1 ? "1 ano" : `${anos} anos`;
+}
+
+const CATALOG_PRODUCT_IMAGES = {
+  "e-CPF": {
+    A1: "assets/images/products/e-cpf-a1-em-arquivo.avif",
+    A3: "assets/images/products/e-cpf-a3-token.avif",
+    Nuvem: "assets/images/products/e-cpf-a1-em-arquivo.avif",
+  },
+  "e-CNPJ": {
+    A1: "assets/images/products/e-cnpj-a1-em-arquivo.avif",
+    A3: "assets/images/products/e-cnpj-a3-token.avif",
+    Nuvem: "assets/images/products/e-cnpj-a1-em-arquivo.avif",
+  },
+};
+
+function catalogProductImage(produto) {
+  const byTipo = CATALOG_PRODUCT_IMAGES[produto.tipo];
+  const fallback = "assets/images/LINKFORTE-vetor.png";
+  if (!byTipo) return fallback;
+  return byTipo[produto.midia] || byTipo.A1 || fallback;
+}
+
+function catalogProductCard(produto) {
+  const installment = formatBRL(produto.preco / 3);
+  const desc = truncateText(produto.descricao || "");
+  const img = assetPath(catalogProductImage(produto));
+  const fallbackImg = assetPath("assets/images/LINKFORTE-vetor.png");
+  return `
+    <article class="product-card product-card--catalog">
+      <div class="product-card__image">
+        <img src="${img}" alt="${produto.nome}" loading="lazy" onerror="this.src='${fallbackImg}'">
+      </div>
+      <div class="product-card__body">
+        <h3 class="product-card__title">${produto.nome}</h3>
+        <p class="product-card__meta">${produto.midia} · ${catalogValidadeLabel(produto.validade_anos)}</p>
+        ${desc ? `<p class="product-card__desc">${desc}</p>` : ""}
+        <div class="product-card__price">R$ ${formatBRL(produto.preco)}</div>
+        <div class="product-card__installment">Em até 3x de R$ ${installment} sem juros</div>
+      </div>
+      <button type="button" class="product-card__buy-btn js-catalog-add" data-produto-id="${produto.id}">
+        Adicionar ao carrinho
+      </button>
+    </article>
+  `;
+}
+
+async function initCatalogVitrine() {
+  const grid = document.getElementById("products-shop");
+  const filterRoot = document.querySelector(".catalog-filter");
+  if (!grid || document.body.dataset.page !== "loja") return;
+
+  let produtos = [];
+  let filter = "all";
+
+  try {
+    produtos = await fetchProdutosSupabase();
+  } catch (err) {
+    console.error(err);
+    grid.innerHTML = '<p class="text-center">Não foi possível carregar os produtos.</p>';
+    return;
+  }
+
+  const produtosById = new Map(produtos.map((p) => [String(p.id), p]));
+
+  const params = new URLSearchParams(window.location.search);
+  const tipoParam = params.get("tipo");
+  if (tipoParam && URL_TIPO_TO_FILTER[tipoParam]) {
+    filter = URL_TIPO_TO_FILTER[tipoParam];
+  }
+
+  function render() {
+    const list = filter === "all" ? produtos : produtos.filter((p) => p.tipo === filter);
+    if (list.length === 0) {
+      grid.innerHTML = '<p class="text-center">Nenhum produto encontrado para este filtro.</p>';
+      return;
+    }
+    grid.innerHTML = list.map(catalogProductCard).join("");
+  }
+
+  function setFilterActive(value) {
+    filter = value;
+    filterRoot?.querySelectorAll(".catalog-filter__btn").forEach((btn) => {
+      btn.setAttribute("aria-pressed", btn.dataset.filter === value ? "true" : "false");
+    });
+    render();
+  }
+
+  filterRoot?.querySelectorAll(".catalog-filter__btn").forEach((btn) => {
+    btn.addEventListener("click", () => setFilterActive(btn.dataset.filter));
+  });
+
+  grid.addEventListener("click", (e) => {
+    const btn = e.target.closest(".js-catalog-add");
+    if (!btn) return;
+    const produto = produtosById.get(btn.dataset.produtoId);
+    if (produto && typeof adicionarAoCarrinho === "function") {
+      adicionarAoCarrinho(produto);
+    }
+  });
+
+  setFilterActive(filter);
+}
+
 function findProdutoBySelection(produtos, selection) {
   const tipo = QUOTE_TYPE_TO_DB[selection.type];
   return produtos.find(
@@ -1925,7 +2037,9 @@ async function initCertificateQuoter() {
 
   addBtn?.addEventListener("click", () => {
     if (!produtoAtual) return;
-    console.log("Adicionar ao carrinho:", produtoAtual);
+    if (typeof adicionarAoCarrinho === "function") {
+      adicionarAoCarrinho(produtoAtual);
+    }
   });
 
   updateQuote();
@@ -1972,6 +2086,6 @@ document.addEventListener("DOMContentLoaded", async () => {
   await initReviewsCarousel();
   initScrollReveal();
   initCertificateQuoter();
-  renderProductGrid("#products-shop");
+  initCatalogVitrine();
   renderProductDetail();
 });

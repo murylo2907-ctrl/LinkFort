@@ -1,0 +1,63 @@
+const CART_KEY = "lf_cart";
+
+function getCarrinho() {
+  try {
+    const raw = localStorage.getItem(CART_KEY);
+    return raw ? JSON.parse(raw) : [];
+  } catch {
+    return [];
+  }
+}
+
+function saveCarrinho(items) {
+  localStorage.setItem(CART_KEY, JSON.stringify(items));
+  dispatchCartUpdate();
+}
+
+function adicionarAoCarrinho(produto) {
+  const items = getCarrinho();
+  const existing = items.find((i) => i.id === produto.id);
+  if (existing) {
+    existing.quantidade += 1;
+  } else {
+    items.push({
+      id: produto.id,
+      nome: produto.nome,
+      tipo: produto.tipo,
+      midia: produto.midia,
+      validade_anos: produto.validade_anos,
+      preco: produto.preco,
+      quantidade: 1,
+    });
+  }
+  saveCarrinho(items);
+  showCartToast(produto.nome);
+}
+
+function getQuantidadeCarrinho() {
+  return getCarrinho().reduce((sum, i) => sum + i.quantidade, 0);
+}
+
+function dispatchCartUpdate() {
+  document.dispatchEvent(
+    new CustomEvent("lf:cart-updated", {
+      detail: { quantidade: getQuantidadeCarrinho() },
+    })
+  );
+}
+
+function showCartToast(nome) {
+  let el = document.getElementById("lf-cart-toast");
+  if (!el) {
+    el = document.createElement("div");
+    el.id = "lf-cart-toast";
+    el.className = "lf-cart-toast";
+    el.setAttribute("role", "status");
+    el.setAttribute("aria-live", "polite");
+    document.body.appendChild(el);
+  }
+  el.textContent = `${nome} adicionado ao carrinho`;
+  el.classList.add("is-visible");
+  clearTimeout(showCartToast._timer);
+  showCartToast._timer = setTimeout(() => el.classList.remove("is-visible"), 2500);
+}
