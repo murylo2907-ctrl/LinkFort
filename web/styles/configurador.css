@@ -1,0 +1,31 @@
+/* Extensões do cotador Link Forte para o app Next.js */
+
+.quote-options--models {
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+}
+
+.quote-ctas {
+  display: flex;
+  flex-direction: column;
+  gap: 0.65rem;
+}
+
+.quote-option:disabled {
+  opacity: 0.4;
+  cursor: not-allowed;
+  pointer-events: none;
+  transform: none;
+  box-shadow: none;
+}
+
+.quote-option:disabled:hover {
+  border-color: rgba(138, 138, 138, 0.18);
+  transform: none;
+  box-shadow: none;
+}
+
+@media (max-width: 767px) {
+  .quote-options--models {
+    grid-template-columns: 1fr;
+  }
+}

@@ -1729,16 +1729,8 @@ async function initFaqSection() {
 }
 
 const QUOTE_TYPE_LABELS = { ecpf: "e-CPF", ecnpj: "e-CNPJ" };
-const QUOTE_VARIANT_LABELS = {
-  token: "Token USB",
-  leitora: "Leitora + Smart Card",
-  sem_midia: "Sem mídia inclusa",
-};
-
-function buildQuoteKey(type, model, a3Variant, years) {
-  if (model === "A3") return `${type}|A3|${a3Variant}|${years}`;
-  return `${type}|${model}|${years}`;
-}
+const QUOTE_TYPE_TO_DB = { ecpf: "e-CPF", ecnpj: "e-CNPJ" };
+const WHATSAPP_QUOTE_NUMBER = "554130263491";
 
 function getQuoteSelection(root) {
   const read = (group) =>
@@ -1747,15 +1739,119 @@ function getQuoteSelection(root) {
   const type = read("type") || "ecpf";
   const model = read("model") || "A1";
   const years = Number(read("years") || "1");
-  const a3Variant = model === "A3" ? read("a3Variant") || "token" : null;
 
-  return { type, model, years, a3Variant };
+  return { type, model, years };
 }
 
-function formatQuoteSummary({ type, model, years, a3Variant }) {
-  const parts = [QUOTE_TYPE_LABELS[type] || type, model, `${years} ano${years > 1 ? "s" : ""}`];
-  if (model === "A3" && a3Variant) parts.splice(2, 0, QUOTE_VARIANT_LABELS[a3Variant] || a3Variant);
-  return parts.join(" · ");
+function formatQuoteSummary({ type, model, years }) {
+  const tipo = QUOTE_TYPE_LABELS[type] || type;
+  return `${tipo} · ${model} · ${years} ano${years > 1 ? "s" : ""}`;
+}
+
+function parseProdutoPreco(preco) {
+  return typeof preco === "string" ? parseFloat(preco) : preco;
+}
+
+async function fetchProdutosSupabase() {
+  const url = window.SUPABASE_URL;
+  const key = window.SUPABASE_ANON_KEY;
+  if (!url || !key) {
+    throw new Error("Configure supabase-config.js com URL e anon key.");
+  }
+
+  const res = await fetch(
+    `${url}/rest/v1/produtos?ativo=eq.true&select=*&order=tipo,midia,validade_anos`,
+    {
+      headers: {
+        apikey: key,
+        Authorization: `Bearer ${key}`,
+      },
+    }
+  );
+
+  if (!res.ok) {
+    throw new Error("Falha ao carregar produtos do Supabase.");
+  }
+
+  const rows = await res.json();
+  return rows.map((p) => ({ ...p, preco: parseProdutoPreco(p.preco) }));
+}
+
+function findProdutoBySelection(produtos, selection) {
+  const tipo = QUOTE_TYPE_TO_DB[selection.type];
+  return produtos.find(
+    (p) =>
+      p.tipo === tipo &&
+      p.midia === selection.model &&
+      p.validade_anos === selection.years
+  );
+}
+
+function setQuoteGroupValue(root, group, value) {
+  root.querySelectorAll(`[data-quote-group="${group}"] .quote-option`).forEach((btn) => {
+    btn.setAttribute("aria-pressed", btn.dataset.value === value ? "true" : "false");
+  });
+}
+
+function updateQuoteOptionAvailability(root, produtos, selection) {
+  root.querySelectorAll('[data-quote-group="type"] .quote-option').forEach((btn) => {
+    const tipo = QUOTE_TYPE_TO_DB[btn.dataset.value];
+    btn.disabled = !produtos.some((p) => p.tipo === tipo);
+  });
+
+  const tipoAtual = QUOTE_TYPE_TO_DB[selection.type];
+  root.querySelectorAll('[data-quote-group="model"] .quote-option').forEach((btn) => {
+    btn.disabled = !produtos.some((p) => p.tipo === tipoAtual && p.midia === btn.dataset.value);
+  });
+
+  root.querySelectorAll('[data-quote-group="years"] .quote-option').forEach((btn) => {
+    const years = Number(btn.dataset.value);
+    btn.disabled = !findProdutoBySelection(produtos, { ...selection, years });
+  });
+}
+
+function autoFixQuoteSelection(root, produtos) {
+  let selection = getQuoteSelection(root);
+
+  if (!produtos.some((p) => p.tipo === QUOTE_TYPE_TO_DB[selection.type])) {
+    const first = ["ecpf", "ecnpj"].find((t) =>
+      produtos.some((p) => p.tipo === QUOTE_TYPE_TO_DB[t])
+    );
+    if (first) {
+      setQuoteGroupValue(root, "type", first);
+      selection = getQuoteSelection(root);
+    }
+  }
+
+  const tipo = QUOTE_TYPE_TO_DB[selection.type];
+  if (!produtos.some((p) => p.tipo === tipo && p.midia === selection.model)) {
+    const firstModel = ["A1", "Nuvem", "A3"].find((m) =>
+      produtos.some((p) => p.tipo === tipo && p.midia === m)
+    );
+    if (firstModel) {
+      setQuoteGroupValue(root, "model", firstModel);
+      selection = getQuoteSelection(root);
+    }
+  }
+
+  if (!findProdutoBySelection(produtos, selection)) {
+    const firstYears = [1, 2, 3].find((y) =>
+      findProdutoBySelection(produtos, { ...selection, years: y })
+    );
+    if (firstYears) {
+      setQuoteGroupValue(root, "years", String(firstYears));
+    }
+  }
+}
+
+function buildQuoteWhatsappMessage(produto, selection) {
+  if (produto) {
+    const tipo = QUOTE_TYPE_LABELS[selection.type];
+    const anosLabel = selection.years === 1 ? "ano" : "anos";
+    return `Olá, quero um ${tipo} ${selection.model} de ${selection.years} ${anosLabel} (R$ ${formatBRL(produto.preco)})`;
+  }
+  const tipo = QUOTE_TYPE_LABELS[selection.type] || selection.type;
+  return `Olá, quero informações sobre certificado digital ${tipo} ${selection.model}`;
 }
 
 async function initCertificateQuoter() {
@@ -1765,86 +1861,71 @@ async function initCertificateQuoter() {
   const priceEl = root.querySelector("[data-quote-price]");
   const installmentEl = root.querySelector("[data-quote-installment]");
   const summaryEl = root.querySelector("[data-quote-summary]");
-  const versionEl = root.querySelector("[data-quote-version]");
-  const buyBtn = root.querySelector(".js-quote-buy");
-  const a3Panel = root.querySelector("[data-quote-a3-panel]");
-  const modelStep = a3Panel?.closest(".quote-step--model");
+  const addBtn = root.querySelector(".js-quote-add");
+  const waBtn = root.querySelector(".js-quote-whatsapp");
 
-  let pricing;
-  let priceMap;
+  let produtos;
 
   try {
-    const res = await fetch(`${getBasePath()}data/pricing.json`);
-    pricing = await res.json();
-    priceMap = new Map((pricing.entries || []).map((e) => [e.key, e]));
-  } catch {
-    if (priceEl) priceEl.textContent = "Indisponível";
-    buyBtn?.classList.add("is-disabled");
+    produtos = await fetchProdutosSupabase();
+  } catch (err) {
+    console.error(err);
+    if (priceEl) priceEl.innerHTML = '<span class="quote-unavailable">Indisponível</span>';
+    addBtn?.classList.add("is-disabled");
+    addBtn?.setAttribute("disabled", "true");
     return;
   }
 
-  if (versionEl && pricing.version) {
-    const date = pricing.effectiveFrom
-      ? new Date(pricing.effectiveFrom).toLocaleDateString("pt-BR")
-      : "";
-    versionEl.textContent = date ? `Tabela v${pricing.version} · vigente desde ${date}` : `Tabela v${pricing.version}`;
-  }
-
   const params = new URLSearchParams(window.location.search);
-  const preset = {
-    type: params.get("tipo") || undefined,
-    model: params.get("modelo") || undefined,
-    years: params.get("anos") ? Number(params.get("anos")) : undefined,
-    a3Variant: params.get("variante") || undefined,
-  };
+  if (params.get("tipo")) setQuoteGroupValue(root, "type", params.get("tipo"));
+  if (params.get("modelo")) setQuoteGroupValue(root, "model", params.get("modelo"));
+  if (params.get("anos")) setQuoteGroupValue(root, "years", params.get("anos"));
 
-  function setGroupValue(group, value) {
-    root.querySelectorAll(`[data-quote-group="${group}"] .quote-option`).forEach((btn) => {
-      btn.setAttribute("aria-pressed", btn.dataset.value === value ? "true" : "false");
-    });
-  }
-
-  if (preset.type) setGroupValue("type", preset.type);
-  if (preset.model) setGroupValue("model", preset.model);
-  if (preset.years) setGroupValue("years", String(preset.years));
-  if (preset.a3Variant) setGroupValue("a3Variant", preset.a3Variant);
+  let produtoAtual = null;
 
   function updateQuote() {
+    autoFixQuoteSelection(root, produtos);
     const selection = getQuoteSelection(root);
-    a3Panel?.classList.toggle("is-hidden", selection.model !== "A3");
-    modelStep?.classList.toggle("quote-step--a3-open", selection.model === "A3");
+    produtoAtual = findProdutoBySelection(produtos, selection);
 
-    const key = buildQuoteKey(selection.type, selection.model, selection.a3Variant, selection.years);
-    const entry = priceMap.get(key);
+    updateQuoteOptionAvailability(root, produtos, selection);
 
-    if (!entry) {
-      if (summaryEl) summaryEl.textContent = formatQuoteSummary(selection);
+    if (summaryEl) summaryEl.textContent = formatQuoteSummary(selection);
+
+    if (produtoAtual) {
+      const installment = produtoAtual.preco / 3;
+      if (priceEl) priceEl.textContent = `R$ ${formatBRL(produtoAtual.preco)}`;
+      if (installmentEl) {
+        installmentEl.textContent = `Em até 3x de R$ ${formatBRL(installment)} sem juros · À vista no Pix`;
+      }
+      addBtn?.classList.remove("is-disabled");
+      addBtn?.removeAttribute("disabled");
+    } else {
       if (priceEl) priceEl.innerHTML = '<span class="quote-unavailable">Consulte nosso time</span>';
       if (installmentEl) installmentEl.textContent = "";
-      buyBtn?.classList.add("is-disabled");
-      return;
+      addBtn?.classList.add("is-disabled");
+      addBtn?.setAttribute("disabled", "true");
     }
 
-    const installment = entry.price / 3;
-    if (summaryEl) summaryEl.textContent = formatQuoteSummary(selection);
-    if (priceEl) priceEl.textContent = `R$ ${formatBRL(entry.price)}`;
-    if (installmentEl) {
-      installmentEl.textContent = `Em até 3x de R$ ${formatBRL(installment)} sem juros · À vista no Pix`;
-    }
-
-    if (buyBtn) {
-      buyBtn.href = productPath(entry.slug);
-      buyBtn.classList.remove("is-disabled");
+    if (waBtn) {
+      const msg = appendReferralToMessage(buildQuoteWhatsappMessage(produtoAtual, selection));
+      waBtn.href = `https://wa.me/${WHATSAPP_QUOTE_NUMBER}?text=${encodeURIComponent(msg)}`;
     }
   }
 
   root.querySelectorAll(".quote-option").forEach((btn) => {
     btn.addEventListener("click", () => {
+      if (btn.disabled) return;
       const group = btn.closest("[data-quote-group]")?.dataset.quoteGroup;
       if (!group) return;
-      setGroupValue(group, btn.dataset.value);
+      setQuoteGroupValue(root, group, btn.dataset.value);
       updateQuote();
     });
+  });
+
+  addBtn?.addEventListener("click", () => {
+    if (!produtoAtual) return;
+    console.log("Adicionar ao carrinho:", produtoAtual);
   });
 
   updateQuote();

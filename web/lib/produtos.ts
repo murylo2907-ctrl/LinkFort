@@ -37,3 +37,33 @@ export async function buscarProdutos(): Promise<Produto[]> {
 
   return (data ?? []).map(mapProduto);
 }
+
+export function encontrarProduto(
+  produtos: Produto[],
+  tipo: Produto["tipo"],
+  midia: Produto["midia"],
+  validade_anos: Produto["validade_anos"]
+): Produto | undefined {
+  return produtos.find(
+    (p) =>
+      p.tipo === tipo && p.midia === midia && p.validade_anos === validade_anos
+  );
+}
+
+const precoFormatter = new Intl.NumberFormat("pt-BR", {
+  style: "currency",
+  currency: "BRL",
+});
+
+export function formatarPreco(preco: number): string {
+  return precoFormatter.format(preco);
+}
+
+export function formatarResumo(
+  tipo: Produto["tipo"],
+  midia: Produto["midia"],
+  validade_anos: Produto["validade_anos"]
+): string {
+  const anos = validade_anos === 1 ? "1 ano" : `${validade_anos} anos`;
+  return `${tipo} · ${midia} · ${anos}`;
+}

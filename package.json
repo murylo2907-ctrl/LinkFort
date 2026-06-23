@@ -4,7 +4,8 @@
   "private": true,
   "description": "Portal SINTRAMOTOS — modernização do site institucional e loja virtual",
   "scripts": {
-    "dev": "npm run dev --prefix web",
+    "dev": "serve link-forte/site -l 3000",
+    "dev:next": "npm run dev --prefix web",
     "dev:static": "serve link-forte/site -l 3000",
     "build": "npm run build --prefix web",
     "start": "npm run start --prefix web"
