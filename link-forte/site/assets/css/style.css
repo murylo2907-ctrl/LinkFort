@@ -1048,6 +1048,88 @@ body.lf-qv-open {
   text-decoration: underline;
 }
 
+/* Checkout */
+.checkout-items__title {
+  font-size: 1.1rem;
+  font-weight: 700;
+  margin-bottom: 1rem;
+}
+
+.checkout-items__list {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+}
+
+.checkout-item {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  gap: 1rem;
+  padding: 0.75rem 0;
+  border-bottom: 1px solid var(--border);
+  font-size: 0.95rem;
+}
+
+.checkout-item__name {
+  flex: 1;
+}
+
+.checkout-item__price {
+  white-space: nowrap;
+  font-weight: 600;
+}
+
+.checkout-coupon {
+  margin: 1rem 0;
+  padding-top: 0.5rem;
+  border-top: 1px solid var(--border);
+}
+
+.checkout-coupon__label {
+  display: block;
+  font-size: 0.9rem;
+  font-weight: 600;
+  margin-bottom: 0.5rem;
+}
+
+.checkout-coupon__row {
+  display: flex;
+  gap: 0.5rem;
+}
+
+.checkout-coupon__input {
+  flex: 1;
+  min-width: 0;
+  padding: 0.6rem 0.75rem;
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  font-size: 0.95rem;
+  font-family: inherit;
+}
+
+.checkout-coupon__input:focus {
+  outline: 2px solid var(--primary);
+  outline-offset: 1px;
+}
+
+.checkout-coupon__apply {
+  flex-shrink: 0;
+  padding: 0.6rem 1rem;
+  font-size: 0.9rem;
+}
+
+.checkout-coupon__error {
+  margin: 0.5rem 0 0;
+  font-size: 0.85rem;
+  color: #c62828;
+  font-weight: 600;
+}
+
+.cart-summary__row--discount strong {
+  color: #2e7d32;
+}
+
 /* Benefits */
 .benefits-grid {
   display: grid;

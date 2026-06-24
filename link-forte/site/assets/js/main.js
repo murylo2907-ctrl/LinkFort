@@ -2357,6 +2357,232 @@ function initCartPage() {
   render();
 }
 
+function getCouponApiBaseUrl() {
+  const url = window.LF_API_BASE_URL;
+  if (!url) return null;
+  const trimmed = String(url).replace(/\/$/, "");
+  return trimmed || null;
+}
+
+async function validarCupomRemoto(codigo, total) {
+  const apiBase = getCouponApiBaseUrl();
+  if (apiBase) {
+    try {
+      const res = await fetch(`${apiBase}/api/validar-cupom`, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ codigo, total }),
+      });
+      return await res.json();
+    } catch {
+      /* fallback Supabase RPC */
+    }
+  }
+
+  const url = window.SUPABASE_URL;
+  const key = window.SUPABASE_ANON_KEY;
+  if (!url || !key) {
+    return { valido: false, erro: "Serviço de cupons indisponível." };
+  }
+
+  const res = await fetch(`${String(url).replace(/\/$/, "")}/rest/v1/rpc/validar_cupom`, {
+    method: "POST",
+    headers: {
+      "Content-Type": "application/json",
+      apikey: key,
+      Authorization: `Bearer ${key}`,
+    },
+    body: JSON.stringify({ p_codigo: codigo, p_total: total }),
+  });
+
+  if (!res.ok) {
+    return { valido: false, erro: "Erro ao validar cupom." };
+  }
+
+  return await res.json();
+}
+
+function initCheckoutPage() {
+  if (document.body.dataset.page !== "checkout") return;
+
+  const COUPON_STORAGE_KEY = "lf_applied_coupon";
+  const emptyEl = document.getElementById("checkout-empty");
+  const contentEl = document.getElementById("checkout-content");
+  const listEl = document.getElementById("checkout-items");
+  const subtotalEl = document.querySelector("[data-checkout-subtotal]");
+  const totalEl = document.querySelector("[data-checkout-total]");
+  const discountRowEl = document.querySelector("[data-checkout-discount-row]");
+  const discountEl = document.querySelector("[data-checkout-discount]");
+  const couponInput = document.querySelector("[data-coupon-input]");
+  const couponApplyBtn = document.querySelector("[data-coupon-apply]");
+  const couponErrorEl = document.querySelector("[data-coupon-error]");
+
+  let appliedCoupon = null;
+
+  function formatMoney(value) {
+    return `R$ ${formatBRL(value)}`;
+  }
+
+  function clearCouponError() {
+    if (!couponErrorEl) return;
+    couponErrorEl.hidden = true;
+    couponErrorEl.textContent = "";
+  }
+
+  function showCouponError(message) {
+    if (!couponErrorEl) return;
+    couponErrorEl.textContent = message;
+    couponErrorEl.hidden = false;
+  }
+
+  function clearAppliedCoupon() {
+    appliedCoupon = null;
+    sessionStorage.removeItem(COUPON_STORAGE_KEY);
+    if (discountRowEl) discountRowEl.hidden = true;
+  }
+
+  function renderCheckoutItemRow(item) {
+    const lineTotal = item.preco * item.quantidade;
+    return `
+      <li class="checkout-item">
+        <span class="checkout-item__name">${item.nome} × ${item.quantidade}</span>
+        <strong class="checkout-item__price">${formatMoney(lineTotal)}</strong>
+      </li>`;
+  }
+
+  function updateTotals(subtotal) {
+    const formattedSubtotal = formatMoney(subtotal);
+    if (subtotalEl) subtotalEl.textContent = formattedSubtotal;
+
+    if (appliedCoupon?.valido) {
+      if (discountRowEl) discountRowEl.hidden = false;
+      if (discountEl) discountEl.textContent = `− ${formatMoney(appliedCoupon.desconto)}`;
+      if (totalEl) totalEl.textContent = formatMoney(appliedCoupon.total_final);
+    } else {
+      if (discountRowEl) discountRowEl.hidden = true;
+      if (totalEl) totalEl.textContent = formattedSubtotal;
+    }
+  }
+
+  function render() {
+    const items = typeof getCarrinho === "function" ? getCarrinho() : [];
+    const hasItems = items.length > 0;
+
+    setCartSectionsVisible(emptyEl, contentEl, hasItems);
+
+    if (!hasItems) {
+      if (listEl) listEl.innerHTML = "";
+      clearAppliedCoupon();
+      return;
+    }
+
+    if (listEl) listEl.innerHTML = items.map(renderCheckoutItemRow).join("");
+    const subtotal = typeof getTotalCarrinho === "function" ? getTotalCarrinho() : 0;
+    updateTotals(subtotal);
+  }
+
+  async function applyCoupon() {
+    clearCouponError();
+    const codigo = couponInput?.value?.trim();
+    if (!codigo) {
+      showCouponError("Informe um código de cupom.");
+      return;
+    }
+
+    const subtotal = typeof getTotalCarrinho === "function" ? getTotalCarrinho() : 0;
+    if (subtotal <= 0) {
+      showCouponError("Adicione itens ao carrinho antes de aplicar um cupom.");
+      return;
+    }
+
+    if (couponApplyBtn) {
+      couponApplyBtn.disabled = true;
+      couponApplyBtn.textContent = "Validando…";
+    }
+
+    try {
+      const data = await validarCupomRemoto(codigo, subtotal);
+
+      if (data.valido) {
+        appliedCoupon = data;
+        sessionStorage.setItem(COUPON_STORAGE_KEY, JSON.stringify(data));
+        if (couponInput) couponInput.value = data.codigo;
+        updateTotals(subtotal);
+      } else {
+        clearAppliedCoupon();
+        updateTotals(subtotal);
+        showCouponError(data.erro || "Cupom inválido ou expirado.");
+      }
+    } catch {
+      clearAppliedCoupon();
+      updateTotals(subtotal);
+      showCouponError("Não foi possível validar o cupom. Tente novamente.");
+    } finally {
+      if (couponApplyBtn) {
+        couponApplyBtn.disabled = false;
+        couponApplyBtn.textContent = "Aplicar";
+      }
+    }
+  }
+
+  async function revalidateCoupon() {
+    if (!appliedCoupon?.codigo) return;
+
+    const subtotal = typeof getTotalCarrinho === "function" ? getTotalCarrinho() : 0;
+    if (subtotal <= 0) {
+      clearAppliedCoupon();
+      return;
+    }
+
+    try {
+      const data = await validarCupomRemoto(appliedCoupon.codigo, subtotal);
+      if (data.valido) {
+        appliedCoupon = data;
+        sessionStorage.setItem(COUPON_STORAGE_KEY, JSON.stringify(data));
+      } else {
+        clearAppliedCoupon();
+        if (couponErrorEl) {
+          showCouponError(data.erro || "Cupom inválido ou expirado.");
+        }
+      }
+    } catch {
+      /* mantém cupom anterior em falha de rede */
+    }
+  }
+
+  try {
+    const stored = sessionStorage.getItem(COUPON_STORAGE_KEY);
+    if (stored) {
+      const parsed = JSON.parse(stored);
+      if (parsed?.valido && parsed?.codigo) {
+        appliedCoupon = parsed;
+        if (couponInput) couponInput.value = parsed.codigo;
+      }
+    }
+  } catch {
+    sessionStorage.removeItem(COUPON_STORAGE_KEY);
+  }
+
+  couponApplyBtn?.addEventListener("click", applyCoupon);
+  couponInput?.addEventListener("keydown", (e) => {
+    if (e.key === "Enter") {
+      e.preventDefault();
+      applyCoupon();
+    }
+  });
+
+  document.addEventListener("lf:cart-updated", async () => {
+    await revalidateCoupon();
+    render();
+  });
+
+  render();
+
+  if (appliedCoupon) {
+    revalidateCoupon().then(render);
+  }
+}
+
 function updateCartBadge() {
   const badge = document.querySelector("[data-cart-badge]");
   if (!badge) return;
@@ -2403,5 +2629,6 @@ document.addEventListener("DOMContentLoaded", async () => {
   initCertificateQuoter();
   initCatalogVitrine();
   initCartPage();
+  initCheckoutPage();
   renderProductDetail();
 });
