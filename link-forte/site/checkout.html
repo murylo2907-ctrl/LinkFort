@@ -38,10 +38,68 @@
           <a href="loja.html" class="btn btn-primary">Continuar comprando</a>
         </div>
 
-        <div id="checkout-content" class="cart-layout" hidden>
-          <div class="checkout-items">
-            <h2 class="checkout-items__title">Itens do pedido</h2>
-            <ul id="checkout-items" class="checkout-items__list" aria-label="Itens do pedido"></ul>
+        <div id="checkout-content" class="cart-layout checkout-layout" hidden>
+          <div class="checkout-main">
+            <div class="checkout-items">
+              <h2 class="checkout-items__title">Itens do pedido</h2>
+              <ul id="checkout-items" class="checkout-items__list" aria-label="Itens do pedido"></ul>
+            </div>
+
+            <form id="checkout-form" class="contact-form checkout-form" novalidate>
+              <h2 class="checkout-form__title">Dados do cliente</h2>
+
+              <div class="form-group">
+                <label for="checkout-nome">Nome completo</label>
+                <input type="text" id="checkout-nome" name="nome" required autocomplete="name" minlength="2" maxlength="200">
+                <p class="checkout-field-error" data-field-error="nome" hidden role="alert"></p>
+              </div>
+
+              <div class="form-group">
+                <label for="checkout-cpf-cnpj">CPF ou CNPJ</label>
+                <input type="text" id="checkout-cpf-cnpj" name="cpfCnpj" required autocomplete="off" inputmode="numeric" maxlength="18" placeholder="000.000.000-00 ou 00.000.000/0000-00">
+                <p class="checkout-field-error" data-field-error="cpfCnpj" hidden role="alert"></p>
+              </div>
+
+              <div class="form-group">
+                <label for="checkout-email">E-mail</label>
+                <input type="email" id="checkout-email" name="email" required autocomplete="email" maxlength="200">
+                <p class="checkout-field-error" data-field-error="email" hidden role="alert"></p>
+              </div>
+
+              <div class="form-group">
+                <label for="checkout-whatsapp">WhatsApp</label>
+                <input type="tel" id="checkout-whatsapp" name="whatsapp" required autocomplete="tel" inputmode="tel" maxlength="20" placeholder="(41) 99999-9999">
+                <p class="checkout-field-error" data-field-error="whatsapp" hidden role="alert"></p>
+              </div>
+
+              <fieldset class="checkout-payment">
+                <legend class="checkout-payment__legend">Forma de pagamento</legend>
+
+                <label class="checkout-payment__option checkout-payment__option--selected">
+                  <input type="radio" name="formaPagamento" value="pix" checked>
+                  <span class="checkout-payment__content">
+                    <span class="checkout-payment__name">PIX</span>
+                    <span class="checkout-payment__desc">5% de desconto automático</span>
+                  </span>
+                </label>
+
+                <label class="checkout-payment__option">
+                  <input type="radio" name="formaPagamento" value="cartao">
+                  <span class="checkout-payment__content">
+                    <span class="checkout-payment__name">Cartão de crédito</span>
+                    <span class="checkout-payment__desc" data-payment-desc-cartao>Até 3x sem juros</span>
+                  </span>
+                </label>
+
+                <label class="checkout-payment__option">
+                  <input type="radio" name="formaPagamento" value="boleto">
+                  <span class="checkout-payment__content">
+                    <span class="checkout-payment__name">Boleto</span>
+                    <span class="checkout-payment__desc">À vista · videoconferência após compensação</span>
+                  </span>
+                </label>
+              </fieldset>
+            </form>
           </div>
 
           <aside class="cart-summary checkout-summary">
@@ -57,10 +115,25 @@
               <strong data-checkout-discount>− R$ 0,00</strong>
             </div>
 
+            <div class="cart-summary__row cart-summary__row--discount" data-checkout-pix-row hidden>
+              <span>Desconto PIX (5%)</span>
+              <strong data-checkout-pix-discount>− R$ 0,00</strong>
+            </div>
+
             <div class="cart-summary__row cart-summary__row--total">
               <span>Total</span>
               <strong data-checkout-total>R$ 0,00</strong>
             </div>
+
+            <p class="checkout-installment" data-checkout-installment hidden>
+              ou em até 3x de <strong data-checkout-installment-value>R$ 0,00</strong> sem juros
+            </p>
+
+            <p class="checkout-summary__error" data-checkout-error hidden role="alert"></p>
+
+            <button type="submit" form="checkout-form" class="btn-comprar cart-summary__cta" data-checkout-submit>
+              Confirmar pedido
+            </button>
 
             <a href="carrinho.html" class="cart-summary__continue">Voltar ao carrinho</a>
           </aside>

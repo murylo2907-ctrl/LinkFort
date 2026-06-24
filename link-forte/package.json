@@ -6,8 +6,8 @@
   "scripts": {
     "build": "node scripts/build.mjs",
     "build:deploy": "node scripts/prepare-deploy.mjs",
-    "dev": "npx --yes serve site -l 3000",
-    "serve": "npx --yes serve site -l 3000",
+    "dev": "node ../scripts/dev-static.mjs",
+    "serve": "node ../scripts/dev-static.mjs",
     "deploy": "node scripts/prepare-deploy.mjs && npx vercel --prod --yes",
     "deploy:dev": "npm run build && node scripts/prepare-deploy.mjs && npx vercel --yes"
   }

@@ -1140,6 +1140,120 @@ body.lf-qv-open {
   color: var(--text-muted, #666);
 }
 
+.checkout-layout .checkout-main {
+  display: flex;
+  flex-direction: column;
+  gap: 2rem;
+}
+
+.checkout-form__title {
+  font-size: 1.1rem;
+  font-weight: 700;
+  margin-bottom: 1rem;
+}
+
+.checkout-form {
+  margin-top: 0;
+}
+
+.checkout-payment {
+  border: none;
+  margin: 0;
+  padding: 0;
+}
+
+.checkout-payment__legend {
+  font-size: 1rem;
+  font-weight: 700;
+  margin-bottom: 0.75rem;
+  padding: 0;
+}
+
+.checkout-payment__option {
+  display: flex;
+  align-items: flex-start;
+  gap: 0.75rem;
+  padding: 0.875rem 1rem;
+  margin-bottom: 0.5rem;
+  border: 2px solid var(--border);
+  border-radius: var(--radius);
+  cursor: pointer;
+  transition: border-color 0.15s, background-color 0.15s;
+}
+
+.checkout-payment__option:hover {
+  border-color: var(--primary);
+}
+
+.checkout-payment__option--selected {
+  border-color: var(--primary);
+  background: rgba(0, 102, 204, 0.04);
+}
+
+.checkout-payment__option input[type="radio"] {
+  margin-top: 0.2rem;
+  flex-shrink: 0;
+}
+
+.checkout-payment__content {
+  display: flex;
+  flex-direction: column;
+  gap: 0.15rem;
+}
+
+.checkout-payment__name {
+  font-weight: 700;
+  font-size: 0.95rem;
+}
+
+.checkout-payment__desc {
+  font-size: 0.85rem;
+  color: var(--text-muted, #666);
+}
+
+.checkout-installment {
+  margin: 0.75rem 0 0;
+  font-size: 0.9rem;
+  color: var(--text-muted, #666);
+  text-align: center;
+}
+
+.checkout-installment strong {
+  color: var(--text, #222);
+}
+
+.checkout-field-error {
+  margin: 0.35rem 0 0;
+  font-size: 0.85rem;
+  color: #c62828;
+  font-weight: 600;
+}
+
+.checkout-field-error[hidden] {
+  display: none;
+}
+
+.form-group input.checkout-input--invalid {
+  border-color: #c62828;
+}
+
+.checkout-summary__error {
+  margin: 0.75rem 0 0;
+  font-size: 0.85rem;
+  color: #c62828;
+  font-weight: 600;
+}
+
+.checkout-summary__error[hidden],
+.checkout-installment[hidden] {
+  display: none;
+}
+
+.cart-summary__cta:disabled {
+  opacity: 0.65;
+  cursor: not-allowed;
+}
+
 /* Benefits */
 .benefits-grid {
   display: grid;

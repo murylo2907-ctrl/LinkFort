@@ -2284,13 +2284,23 @@ function setCartSectionsVisible(emptyEl, contentEl, hasItems) {
 
 function getCouponApiBaseUrl() {
   const url = window.LF_API_BASE_URL;
-  if (!url) return null;
-  const trimmed = String(url).replace(/\/$/, "");
-  if (!trimmed) return null;
-  if (trimmed.includes("localhost") && !window.location.hostname.includes("localhost")) {
-    return null;
+  if (url) {
+    const trimmed = String(url).replace(/\/$/, "");
+    if (trimmed) {
+      if (trimmed.includes("localhost") && !window.location.hostname.includes("localhost")) {
+        return null;
+      }
+      return trimmed;
+    }
   }
-  return trimmed;
+
+  const isLocal =
+    window.location.hostname === "localhost" || window.location.hostname === "127.0.0.1";
+  if (isLocal) {
+    return "http://localhost:3001";
+  }
+
+  return null;
 }
 
 async function validarCupomRemoto(codigo, total) {
@@ -2330,6 +2340,30 @@ async function validarCupomRemoto(codigo, total) {
   }
 
   return await res.json();
+}
+
+function getCheckoutApiBaseUrl() {
+  return getCouponApiBaseUrl();
+}
+
+async function checkoutRemoto(payload) {
+  const apiBase = getCheckoutApiBaseUrl();
+  if (!apiBase) {
+    return { ok: false, erro: "Serviço de checkout indisponível. Configure a API Next.js." };
+  }
+
+  try {
+    const res = await fetch(`${apiBase}/api/checkout`, {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify(payload),
+    });
+    const data = await res.json();
+    if (data && typeof data === "object" && "ok" in data) return data;
+    return { ok: false, erro: "Resposta inválida do servidor." };
+  } catch {
+    return { ok: false, erro: "Não foi possível conectar ao servidor. Tente novamente." };
+  }
 }
 
 function initCartPage() {
@@ -2484,6 +2518,13 @@ function initCartPage() {
   }
 
   cartPage?.addEventListener("click", (e) => {
+    if (e.target.closest(".cart-summary__cta")) {
+      e.preventDefault();
+      const items = typeof getCarrinho === "function" ? getCarrinho() : [];
+      if (items.length === 0) return;
+      window.location.href = navHref("checkout.html", getBasePath());
+      return;
+    }
     if (e.target.closest("[data-coupon-apply]")) {
       e.preventDefault();
       applyCoupon();
@@ -2555,28 +2596,68 @@ function initCheckoutPage() {
   const emptyEl = document.getElementById("checkout-empty");
   const contentEl = document.getElementById("checkout-content");
   const listEl = document.getElementById("checkout-items");
+  const formEl = document.getElementById("checkout-form");
   const subtotalEl = document.querySelector("[data-checkout-subtotal]");
   const totalEl = document.querySelector("[data-checkout-total]");
   const discountRowEl = document.querySelector("[data-checkout-discount-row]");
   const discountEl = document.querySelector("[data-checkout-discount]");
   const couponCodeEl = document.querySelector("[data-checkout-coupon-code]");
+  const pixRowEl = document.querySelector("[data-checkout-pix-row]");
+  const pixDiscountEl = document.querySelector("[data-checkout-pix-discount]");
+  const installmentEl = document.querySelector("[data-checkout-installment]");
+  const installmentValueEl = document.querySelector("[data-checkout-installment-value]");
+  const cartaoDescEl = document.querySelector("[data-payment-desc-cartao]");
+  const errorEl = document.querySelector("[data-checkout-error]");
+  const submitBtn = document.querySelector("[data-checkout-submit]");
+  const paymentOptions = document.querySelectorAll(".checkout-payment__option");
 
-  let appliedCoupon = null;
+  let appliedCouponCode = null;
+  let currentResumo = null;
+  let calcRequestId = 0;
 
   function formatMoney(value) {
     return `R$ ${formatBRL(value)}`;
   }
 
-  function loadStoredCoupon() {
+  function loadStoredCouponCode() {
     try {
       const stored = sessionStorage.getItem(COUPON_STORAGE_KEY);
       if (!stored) return null;
       const parsed = JSON.parse(stored);
-      return parsed?.valido && parsed?.codigo ? parsed : null;
+      return parsed?.valido && parsed?.codigo ? parsed.codigo : null;
     } catch {
       sessionStorage.removeItem(COUPON_STORAGE_KEY);
       return null;
     }
+  }
+
+  function clearCheckoutError() {
+    if (!errorEl) return;
+    errorEl.hidden = true;
+    errorEl.textContent = "";
+  }
+
+  function showCheckoutError(message) {
+    if (!errorEl) return;
+    errorEl.textContent = message;
+    errorEl.hidden = false;
+  }
+
+  function getCartItemsPayload() {
+    const items = typeof getCarrinho === "function" ? getCarrinho() : [];
+    return items.map((item) => ({ id: item.id, quantidade: item.quantidade }));
+  }
+
+  function getSelectedFormaPagamento() {
+    const selected = formEl?.querySelector('input[name="formaPagamento"]:checked');
+    return selected?.value || "pix";
+  }
+
+  function updatePaymentOptionStyles() {
+    paymentOptions.forEach((option) => {
+      const input = option.querySelector('input[name="formaPagamento"]');
+      option.classList.toggle("checkout-payment__option--selected", input?.checked === true);
+    });
   }
 
   function renderCheckoutItemRow(item) {
@@ -2588,21 +2669,175 @@ function initCheckoutPage() {
       </li>`;
   }
 
-  function updateTotals(subtotal) {
-    appliedCoupon = loadStoredCoupon();
-    const formattedSubtotal = formatMoney(subtotal);
-    if (subtotalEl) subtotalEl.textContent = formattedSubtotal;
+  function updateResumoUI(resumo) {
+    currentResumo = resumo;
+    if (!resumo) return;
 
-    if (appliedCoupon?.valido === true) {
+    if (subtotalEl) subtotalEl.textContent = formatMoney(resumo.subtotal);
+
+    if (resumo.descontoCupom > 0) {
       if (discountRowEl) discountRowEl.hidden = false;
-      if (discountEl) discountEl.textContent = `− ${formatMoney(appliedCoupon.desconto)}`;
-      if (couponCodeEl) couponCodeEl.textContent = `(${appliedCoupon.codigo})`;
-      if (totalEl) totalEl.textContent = formatMoney(appliedCoupon.total_final);
+      if (discountEl) discountEl.textContent = `− ${formatMoney(resumo.descontoCupom)}`;
+      if (couponCodeEl && appliedCouponCode) couponCodeEl.textContent = `(${appliedCouponCode})`;
     } else {
       if (discountRowEl) discountRowEl.hidden = true;
       if (couponCodeEl) couponCodeEl.textContent = "";
-      if (totalEl) totalEl.textContent = formattedSubtotal;
     }
+
+    if (resumo.descontoPix > 0) {
+      if (pixRowEl) pixRowEl.hidden = false;
+      if (pixDiscountEl) pixDiscountEl.textContent = `− ${formatMoney(resumo.descontoPix)}`;
+    } else {
+      if (pixRowEl) pixRowEl.hidden = true;
+    }
+
+    if (totalEl) totalEl.textContent = formatMoney(resumo.total);
+
+    if (installmentEl && installmentValueEl) {
+      installmentEl.hidden = false;
+      installmentValueEl.textContent = formatMoney(resumo.parcelaCartao);
+    }
+
+    if (cartaoDescEl) {
+      cartaoDescEl.textContent = `Até 3x de ${formatMoney(resumo.parcelaCartao)} sem juros`;
+    }
+  }
+
+  async function recalcularPrecos() {
+    const itens = getCartItemsPayload();
+    if (itens.length === 0) return;
+
+    const requestId = ++calcRequestId;
+    clearCheckoutError();
+
+    if (submitBtn) submitBtn.disabled = true;
+
+    const result = await checkoutRemoto({
+      acao: "calcular",
+      itens,
+      formaPagamento: getSelectedFormaPagamento(),
+      cupom: appliedCouponCode || undefined,
+    });
+
+    if (requestId !== calcRequestId) return;
+
+    if (submitBtn) submitBtn.disabled = false;
+
+    if (!result.ok) {
+      showCheckoutError(result.erro || "Erro ao calcular preços.");
+      return;
+    }
+
+    updateResumoUI(result.resumo);
+  }
+
+  function onlyDigits(value) {
+    return String(value || "").replace(/\D/g, "");
+  }
+
+  function clearFieldErrors() {
+    formEl?.querySelectorAll("[data-field-error]").forEach((el) => {
+      el.hidden = true;
+      el.textContent = "";
+    });
+    formEl?.querySelectorAll(".checkout-input--invalid").forEach((el) => {
+      el.classList.remove("checkout-input--invalid");
+    });
+  }
+
+  function showFieldError(fieldName, message) {
+    const input = formEl?.querySelector(`[name="${fieldName}"]`);
+    const error = formEl?.querySelector(`[data-field-error="${fieldName}"]`);
+    if (input) input.classList.add("checkout-input--invalid");
+    if (error) {
+      error.textContent = message;
+      error.hidden = false;
+    }
+    input?.focus();
+  }
+
+  function validarFormularioCheckout(formData) {
+    clearFieldErrors();
+
+    const nome = String(formData.get("nome") || "").trim();
+    const cpfCnpj = String(formData.get("cpfCnpj") || "");
+    const email = String(formData.get("email") || "").trim();
+    const whatsapp = String(formData.get("whatsapp") || "");
+
+    if (nome.length < 2) {
+      showFieldError("nome", "Informe seu nome completo (mínimo 2 caracteres).");
+      return false;
+    }
+
+    const cpfCnpjDigits = onlyDigits(cpfCnpj);
+    if (cpfCnpjDigits.length !== 11 && cpfCnpjDigits.length !== 14) {
+      showFieldError("cpfCnpj", "CPF deve ter 11 dígitos ou CNPJ 14 dígitos.");
+      return false;
+    }
+
+    if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) {
+      showFieldError("email", "Informe um e-mail válido.");
+      return false;
+    }
+
+    const whatsappDigits = onlyDigits(whatsapp);
+    if (whatsappDigits.length < 10 || whatsappDigits.length > 13) {
+      showFieldError("whatsapp", "Informe um WhatsApp válido com DDD (ex.: 41999999999).");
+      return false;
+    }
+
+    return true;
+  }
+
+  async function handleSubmit(e) {
+    e.preventDefault();
+    clearCheckoutError();
+    clearFieldErrors();
+
+    const itens = getCartItemsPayload();
+    if (itens.length === 0) {
+      showCheckoutError("Seu carrinho está vazio.");
+      return;
+    }
+
+    const formData = new FormData(formEl);
+    if (!validarFormularioCheckout(formData)) {
+      showCheckoutError("Corrija os campos destacados antes de confirmar.");
+      return;
+    }
+
+    if (submitBtn) {
+      submitBtn.disabled = true;
+      submitBtn.textContent = "Processando…";
+    }
+
+    const result = await checkoutRemoto({
+      acao: "criar",
+      itens,
+      formaPagamento: getSelectedFormaPagamento(),
+      cupom: appliedCouponCode || undefined,
+      cliente: {
+        nome: formData.get("nome"),
+        cpfCnpj: formData.get("cpfCnpj"),
+        email: formData.get("email"),
+        whatsapp: formData.get("whatsapp"),
+      },
+    });
+
+    if (!result.ok) {
+      showCheckoutError(result.erro || "Erro ao criar pedido.");
+      if (submitBtn) {
+        submitBtn.disabled = false;
+        submitBtn.textContent = "Confirmar pedido";
+      }
+      return;
+    }
+
+    let redirect = result.redirectUrl;
+    if (redirect && redirect.startsWith("/pagamento")) {
+      redirect = navHref(`pagamento.html${redirect.slice("/pagamento".length)}`, getBasePath());
+    }
+    window.location.href = redirect || navHref(`pagamento.html?pedido=${result.pedidoId}`, getBasePath());
   }
 
   function render() {
@@ -2613,15 +2848,37 @@ function initCheckoutPage() {
 
     if (!hasItems) {
       if (listEl) listEl.innerHTML = "";
+      currentResumo = null;
       return;
     }
 
     if (listEl) listEl.innerHTML = items.map(renderCheckoutItemRow).join("");
-    const subtotal = typeof getTotalCarrinho === "function" ? getTotalCarrinho() : 0;
-    updateTotals(subtotal);
+    appliedCouponCode = loadStoredCouponCode();
+    recalcularPrecos();
   }
 
+  formEl?.addEventListener("submit", handleSubmit);
+
+  formEl?.addEventListener("input", (e) => {
+    const target = e.target;
+    if (!target.name) return;
+    target.classList.remove("checkout-input--invalid");
+    const error = formEl?.querySelector(`[data-field-error="${target.name}"]`);
+    if (error) {
+      error.hidden = true;
+      error.textContent = "";
+    }
+  });
+
+  formEl?.addEventListener("change", (e) => {
+    if (e.target.matches('input[name="formaPagamento"]')) {
+      updatePaymentOptionStyles();
+      recalcularPrecos();
+    }
+  });
+
   document.addEventListener("lf:cart-updated", render);
+  updatePaymentOptionStyles();
   render();
 }
 

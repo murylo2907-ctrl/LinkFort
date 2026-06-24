@@ -29,9 +29,10 @@ export default async function Home() {
           Em desenvolvimento
         </h1>
         <p className="mt-4 text-zinc-600">
-          O site público roda em{" "}
-          <code className="rounded bg-zinc-100 px-1">npm run dev</code> (loja
-          estática). Este app Next.js será usado para checkout, carrinho e APIs.
+          Site estático em{" "}
+          <code className="rounded bg-zinc-100 px-1">http://localhost:3000</code>.
+          APIs de checkout e cupons neste app em{" "}
+          <code className="rounded bg-zinc-100 px-1">http://localhost:3001</code>.
         </p>
 
         <div className="mt-8 rounded-xl border border-zinc-100 bg-zinc-50 p-4">
@@ -49,13 +50,22 @@ export default async function Home() {
 
         <ul className="mt-8 space-y-2 text-sm text-zinc-600">
           <li>
-            Site completo + configurador:{" "}
-            <code className="rounded bg-zinc-100 px-1">npm run dev</code> →{" "}
-            <code className="rounded bg-zinc-100 px-1">/loja.html</code>
+            Site (loja + checkout):{" "}
+            <code className="rounded bg-zinc-100 px-1">npm run dev:static</code>{" "}
+            →{" "}
+            <a href="http://localhost:3000/loja.html" className="text-blue-600 underline">
+              http://localhost:3000
+            </a>
           </li>
           <li>
-            App Next.js:{" "}
-            <code className="rounded bg-zinc-100 px-1">npm run dev:next</code>
+            API Next.js:{" "}
+            <code className="rounded bg-zinc-100 px-1">npm run dev:next</code>{" "}
+            →{" "}
+            <code className="rounded bg-zinc-100 px-1">http://localhost:3001</code>
+          </li>
+          <li>
+            Os dois juntos:{" "}
+            <code className="rounded bg-zinc-100 px-1">npm run dev:all</code>
           </li>
         </ul>
       </main>

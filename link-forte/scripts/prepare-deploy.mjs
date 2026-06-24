@@ -57,7 +57,7 @@ let apiUrl = process.env.LF_API_BASE_URL?.trim();
 if (!apiUrl) {
   const apiSource = existsSync(apiLocalPath) ? apiLocalPath : apiExamplePath;
   const fromApiFile = readApiFromFile(apiSource);
-  apiUrl = fromApiFile.apiUrl || "";
+  apiUrl = fromApiFile.apiUrl || "http://localhost:3001";
 }
 
 const apiBody = `// Gerado em deploy — não commitar (ver .gitignore)
