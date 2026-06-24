@@ -2366,6 +2366,42 @@ async function checkoutRemoto(payload) {
   }
 }
 
+async function pagamentoRemoto(payload) {
+  const apiBase = getCheckoutApiBaseUrl();
+  if (!apiBase) {
+    return { ok: false, erro: "Serviço de pagamento indisponível. Configure a API Next.js." };
+  }
+
+  try {
+    const res = await fetch(`${apiBase}/api/pagamento`, {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify(payload),
+    });
+    const data = await res.json();
+    if (data && typeof data === "object" && "ok" in data) return data;
+    return { ok: false, erro: "Resposta inválida do servidor." };
+  } catch {
+    return { ok: false, erro: "Não foi possível conectar ao servidor. Tente novamente." };
+  }
+}
+
+function getPedidoIdFromUrl() {
+  return new URLSearchParams(window.location.search).get("pedido")?.trim() || "";
+}
+
+function loadMercadoPagoSdk() {
+  if (window.MercadoPago) return Promise.resolve();
+  return new Promise((resolve, reject) => {
+    const script = document.createElement("script");
+    script.src = "https://sdk.mercadopago.com/js/v2";
+    script.async = true;
+    script.onload = () => resolve();
+    script.onerror = () => reject(new Error("Não foi possível carregar o SDK do Mercado Pago."));
+    document.head.appendChild(script);
+  });
+}
+
 function initCartPage() {
   if (document.body.dataset.page !== "carrinho") return;
 
@@ -2882,6 +2918,211 @@ function initCheckoutPage() {
   render();
 }
 
+function initPagamentoPage() {
+  if (document.body.dataset.page !== "pagamento") return;
+
+  const loadingEl = document.getElementById("payment-loading");
+  const errorEl = document.getElementById("payment-error");
+  const errorMsgEl = document.querySelector("[data-payment-error]");
+  const pixEl = document.getElementById("payment-pix");
+  const boletoEl = document.getElementById("payment-boleto");
+  const cartaoEl = document.getElementById("payment-cartao");
+  const successEl = document.getElementById("payment-success");
+  const successMsgEl = document.querySelector("[data-payment-success-message]");
+
+  const pedidoId = getPedidoIdFromUrl();
+
+  function formatMoney(value) {
+    return `R$ ${formatBRL(value)}`;
+  }
+
+  function hideAllPanels() {
+    loadingEl.hidden = true;
+    errorEl.hidden = true;
+    pixEl.hidden = true;
+    boletoEl.hidden = true;
+    cartaoEl.hidden = true;
+    successEl.hidden = true;
+  }
+
+  function showError(message) {
+    hideAllPanels();
+    if (errorMsgEl) errorMsgEl.textContent = message;
+    errorEl.hidden = false;
+  }
+
+  function showPix(data) {
+    hideAllPanels();
+    const amountEl = document.querySelector("[data-payment-amount-pix]");
+    const qrImg = document.querySelector("[data-payment-qr-img]");
+    const pixCodeInput = document.querySelector("[data-payment-pix-code]");
+    const expiryEl = document.querySelector("[data-payment-expiry]");
+
+    if (amountEl) amountEl.textContent = formatMoney(data.amount);
+    if (qrImg && data.qrCodeBase64) {
+      qrImg.src = `data:image/png;base64,${data.qrCodeBase64}`;
+    }
+    if (pixCodeInput) pixCodeInput.value = data.qrCode || "";
+
+    if (expiryEl && data.expirationDate) {
+      const date = new Date(data.expirationDate);
+      expiryEl.textContent = `Válido até ${date.toLocaleString("pt-BR")}`;
+      expiryEl.hidden = false;
+    }
+
+    pixEl.hidden = false;
+
+    const copyBtn = document.querySelector("[data-payment-copy-pix]");
+    const copyFeedback = document.querySelector("[data-payment-copy-feedback]");
+    copyBtn?.addEventListener("click", async () => {
+      if (!data.qrCode) return;
+      try {
+        await navigator.clipboard.writeText(data.qrCode);
+        if (copyFeedback) {
+          copyFeedback.hidden = false;
+          setTimeout(() => {
+            copyFeedback.hidden = true;
+          }, 2500);
+        }
+      } catch {
+        pixCodeInput?.select();
+        document.execCommand("copy");
+      }
+    });
+  }
+
+  function showBoleto(data) {
+    hideAllPanels();
+    const amountEl = document.querySelector("[data-payment-amount-boleto]");
+    const linkEl = document.querySelector("[data-payment-boleto-link]");
+    const barcodeEl = document.querySelector("[data-payment-barcode]");
+
+    if (amountEl) amountEl.textContent = formatMoney(data.amount);
+    if (linkEl && data.ticketUrl) {
+      linkEl.href = data.ticketUrl;
+    }
+    if (barcodeEl && data.barcode) {
+      barcodeEl.textContent = data.barcode;
+      barcodeEl.hidden = false;
+    }
+
+    boletoEl.hidden = false;
+  }
+
+  function showCartaoSuccess(data) {
+    hideAllPanels();
+    const statusLabels = {
+      approved: "aprovado",
+      pending: "em processamento",
+      in_process: "em processamento",
+      rejected: "recusado",
+    };
+    const statusText = statusLabels[data.status] || data.status;
+    if (successMsgEl) {
+      successMsgEl.textContent = `Seu pagamento foi ${statusText}. Em breve entraremos em contato para agendar a videoconferência.`;
+    }
+    successEl.hidden = false;
+  }
+
+  async function initCardBrick(data) {
+    hideAllPanels();
+
+    const amountEl = document.querySelector("[data-payment-amount-cartao]");
+    const installmentsEl = document.querySelector("[data-payment-cartao-installments]");
+
+    if (amountEl) amountEl.textContent = formatMoney(data.amount);
+    if (installmentsEl) {
+      installmentsEl.textContent = `Até ${data.maxInstallments}x de ${formatMoney(data.parcelaSugerida)} sem juros`;
+    }
+
+    cartaoEl.hidden = false;
+
+    if (data.status && data.paymentId) {
+      showCartaoSuccess(data);
+      return;
+    }
+
+    try {
+      await loadMercadoPagoSdk();
+    } catch (err) {
+      showError(err instanceof Error ? err.message : "Erro ao carregar formulário de cartão.");
+      return;
+    }
+
+    const mp = new window.MercadoPago(data.publicKey, { locale: "pt-BR" });
+    const bricksBuilder = mp.bricks();
+
+    await bricksBuilder.create("cardPayment", "cardPaymentBrick_container", {
+      initialization: {
+        amount: data.amount,
+      },
+      customization: {
+        paymentMethods: {
+          maxInstallments: data.maxInstallments || 3,
+        },
+      },
+      callbacks: {
+        onReady: () => {},
+        onError: (err) => {
+          console.error("[cardPayment]", err);
+        },
+        onSubmit: (cardFormData) => {
+          return pagamentoRemoto({
+            pedidoId,
+            acao: "confirmar",
+            token: cardFormData.token,
+            paymentMethodId: cardFormData.payment_method_id,
+            installments: Number(cardFormData.installments) || 1,
+          }).then((result) => {
+            if (!result.ok) {
+              throw new Error(result.erro || "Erro ao processar pagamento.");
+            }
+            if (result.status === "approved" || result.status === "pending" || result.status === "in_process") {
+              showCartaoSuccess(result);
+              if (typeof limparCarrinho === "function") limparCarrinho();
+            } else {
+              throw new Error("Pagamento não aprovado. Verifique os dados do cartão e tente novamente.");
+            }
+          });
+        },
+      },
+    });
+  }
+
+  async function init() {
+    if (!pedidoId) {
+      showError("Pedido não informado. Volte ao checkout e tente novamente.");
+      return;
+    }
+
+    const result = await pagamentoRemoto({ pedidoId, acao: "criar" });
+
+    if (!result.ok) {
+      showError(result.erro || "Erro ao preparar pagamento.");
+      return;
+    }
+
+    if (result.forma === "pix") {
+      showPix(result);
+      return;
+    }
+
+    if (result.forma === "boleto") {
+      showBoleto(result);
+      return;
+    }
+
+    if (result.forma === "cartao") {
+      await initCardBrick(result);
+      return;
+    }
+
+    showError("Forma de pagamento não reconhecida.");
+  }
+
+  init();
+}
+
 function updateCartBadge() {
   const badge = document.querySelector("[data-cart-badge]");
   if (!badge) return;
@@ -2929,5 +3170,6 @@ document.addEventListener("DOMContentLoaded", async () => {
   initCatalogVitrine();
   initCartPage();
   initCheckoutPage();
+  initPagamentoPage();
   renderProductDetail();
 });

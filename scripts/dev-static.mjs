@@ -5,7 +5,9 @@ import { fileURLToPath } from "url";
 
 const PORT = 3000;
 const HOST = "127.0.0.1";
-const siteDir = join(dirname(fileURLToPath(import.meta.url)), "..", "link-forte", "site");
+const root = dirname(fileURLToPath(import.meta.url));
+const siteDir = join(root, "..", "link-forte", "site");
+const serveBin = join(root, "..", "node_modules", "serve", "build", "main.js");
 
 function isPortFree(port, host) {
   return new Promise((resolve) => {
@@ -30,9 +32,8 @@ if (!free) {
 
 console.log(`Site estático → http://localhost:${PORT}`);
 
-const child = spawn("npx", ["serve", siteDir, "-l", `tcp://${HOST}:${PORT}`, "-n"], {
+const child = spawn(process.execPath, [serveBin, siteDir, "-l", `tcp://${HOST}:${PORT}`, "-n"], {
   stdio: "inherit",
-  shell: true,
 });
 
 child.on("exit", (code) => process.exit(code ?? 0));

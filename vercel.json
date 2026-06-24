@@ -7,7 +7,8 @@
     { "source": "/parceiro", "destination": "/parceiro/login.html" },
     { "source": "/loja", "destination": "/loja.html" },
     { "source": "/carrinho", "destination": "/carrinho.html" },
-    { "source": "/checkout", "destination": "/checkout.html" }
+    { "source": "/checkout", "destination": "/checkout.html" },
+    { "source": "/pagamento", "destination": "/pagamento.html" }
   ],
   "redirects": [
     { "source": "/seja-parceiro", "destination": "/", "permanent": true },

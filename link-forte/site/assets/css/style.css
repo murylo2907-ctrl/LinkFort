@@ -1859,3 +1859,146 @@ body.lf-qv-open {
     max-width: 100%;
   }
 }
+
+/* Pagamento */
+.payment-page__container {
+  max-width: 560px;
+  margin: 0 auto;
+}
+
+.payment-state {
+  text-align: center;
+  padding: 3rem 1rem;
+}
+
+.payment-state__message {
+  font-size: 1.05rem;
+  color: var(--text-muted, #666);
+  margin-bottom: 1.5rem;
+}
+
+.payment-state__message--error {
+  color: #c62828;
+  font-weight: 600;
+}
+
+.payment-panel {
+  background: #fff;
+  border: 1px solid var(--border, #e0e0e0);
+  border-radius: var(--radius, 8px);
+  padding: 2rem 1.5rem;
+}
+
+.payment-panel--success {
+  text-align: center;
+}
+
+.payment-panel__header {
+  margin-bottom: 1.5rem;
+}
+
+.payment-panel__header h2 {
+  font-size: 1.35rem;
+  font-weight: 700;
+  margin-bottom: 0.5rem;
+}
+
+.payment-panel__amount {
+  font-size: 1.1rem;
+  margin-bottom: 0.5rem;
+}
+
+.payment-panel__hint {
+  font-size: 0.9rem;
+  color: var(--text-muted, #666);
+  line-height: 1.5;
+}
+
+.payment-panel__expiry {
+  margin-top: 1rem;
+  font-size: 0.85rem;
+  color: var(--text-muted, #666);
+  text-align: center;
+}
+
+.payment-pix__qr {
+  display: flex;
+  justify-content: center;
+  margin-bottom: 1.5rem;
+}
+
+.payment-pix__qr img {
+  border: 1px solid var(--border, #e0e0e0);
+  border-radius: var(--radius, 8px);
+  padding: 0.5rem;
+  background: #fff;
+}
+
+.payment-pix__label {
+  display: block;
+  font-size: 0.85rem;
+  font-weight: 600;
+  margin-bottom: 0.5rem;
+}
+
+.payment-pix__copy-row {
+  display: flex;
+  gap: 0.5rem;
+}
+
+.payment-pix__input {
+  flex: 1;
+  min-width: 0;
+  padding: 0.625rem 0.75rem;
+  border: 1px solid var(--border, #e0e0e0);
+  border-radius: var(--radius, 8px);
+  font-size: 0.8rem;
+  font-family: monospace;
+}
+
+.payment-pix__copied {
+  margin-top: 0.5rem;
+  font-size: 0.85rem;
+  color: #2e7d32;
+  font-weight: 600;
+}
+
+.payment-boleto__link {
+  display: inline-block;
+  width: 100%;
+  text-align: center;
+  margin-top: 0.5rem;
+}
+
+.payment-boleto__barcode {
+  margin-top: 1rem;
+  font-size: 0.8rem;
+  font-family: monospace;
+  word-break: break-all;
+  color: var(--text-muted, #666);
+}
+
+.payment-card-brick {
+  min-height: 280px;
+}
+
+.btn-secondary {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  padding: 0.625rem 1rem;
+  border: 2px solid var(--primary, #0066cc);
+  border-radius: var(--radius, 8px);
+  background: transparent;
+  color: var(--primary, #0066cc);
+  font-weight: 700;
+  font-size: 0.9rem;
+  cursor: pointer;
+  white-space: nowrap;
+  transition: background 0.15s, color 0.15s;
+}
+
+.btn-secondary:hover {
+  background: var(--primary, #0066cc);
+  color: #fff;
+}

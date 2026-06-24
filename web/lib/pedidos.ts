@@ -1,4 +1,5 @@
 import { createClient } from "@/lib/supabase";
+import { createServiceClient } from "@/lib/supabase-admin";
 import type { ValidarCupomResponse } from "@/lib/cupons";
 import { isValidarCupomValido } from "@/lib/cupons";
 import {
@@ -62,6 +63,78 @@ export type CheckoutErrorResponse = {
 
 const UUID_REGEX =
   /^[0-9a-f]{8}-[0-9a-f]{4}-[1-5][0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$/i;
+
+export function isValidPedidoId(value: string): boolean {
+  return UUID_REGEX.test(value);
+}
+
+export type PedidoRow = {
+  id: string;
+  status: "pendente" | "pago" | "cancelado" | "expirado";
+  cliente_nome: string;
+  cliente_cpf_cnpj: string;
+  cliente_email: string;
+  cliente_whatsapp: string;
+  forma_pagamento: FormaPagamento;
+  subtotal: number;
+  desconto_cupom: number;
+  desconto_pix: number;
+  total: number;
+  cupom_codigo: string | null;
+  mp_payment_id: string | null;
+  mp_status: string | null;
+  created_at: string;
+};
+
+export type PedidoItemRow = {
+  id: string;
+  pedido_id: string;
+  produto_id: string;
+  quantidade: number;
+  preco_unitario: number;
+  nome_snapshot: string;
+};
+
+export type PedidoParaPagamento = {
+  pedido: PedidoRow;
+  itens: PedidoItemRow[];
+};
+
+function parseNumeric(value: string | number): number {
+  return typeof value === "string" ? parseFloat(value) : value;
+}
+
+type PedidoDbRow = Omit<PedidoRow, "subtotal" | "desconto_cupom" | "desconto_pix" | "total"> & {
+  subtotal: string | number;
+  desconto_cupom: string | number;
+  desconto_pix: string | number;
+  total: string | number;
+};
+
+type PedidoItemDbRow = Omit<PedidoItemRow, "preco_unitario" | "quantidade"> & {
+  preco_unitario: string | number;
+  quantidade: string | number;
+};
+
+function mapPedidoRow(row: PedidoDbRow): PedidoRow {
+  return {
+    ...row,
+    subtotal: parseNumeric(row.subtotal),
+    desconto_cupom: parseNumeric(row.desconto_cupom),
+    desconto_pix: parseNumeric(row.desconto_pix),
+    total: parseNumeric(row.total),
+    mp_payment_id: row.mp_payment_id ?? null,
+    mp_status: row.mp_status ?? null,
+  };
+}
+
+function mapPedidoItemRow(row: PedidoItemDbRow): PedidoItemRow {
+  return {
+    ...row,
+    quantidade: typeof row.quantidade === "string" ? parseInt(row.quantidade, 10) : row.quantidade,
+    preco_unitario: parseNumeric(row.preco_unitario),
+  };
+}
 
 export function onlyDigits(value: string): string {
   return value.replace(/\D/g, "");
@@ -309,4 +382,94 @@ export async function criarPedido(
   }
 
   return { ok: true, pedidoId };
+}
+
+export async function buscarPedidoParaPagamento(
+  pedidoId: string
+): Promise<{ ok: true; data: PedidoParaPagamento } | { ok: false; erro: string; status?: number }> {
+  if (!isValidPedidoId(pedidoId)) {
+    return { ok: false, erro: "ID do pedido inválido.", status: 400 };
+  }
+
+  let supabase;
+  try {
+    supabase = createServiceClient();
+  } catch (err) {
+    const message = err instanceof Error ? err.message : "Erro de configuração do servidor.";
+    return { ok: false, erro: message, status: 500 };
+  }
+
+  const { data: pedidoData, error: pedidoError } = await supabase
+    .from("pedidos")
+    .select("*")
+    .eq("id", pedidoId)
+    .maybeSingle();
+
+  if (pedidoError) {
+    if (process.env.NODE_ENV === "development") {
+      console.error("[buscarPedidoParaPagamento] pedidos:", pedidoError.message);
+    }
+    return { ok: false, erro: "Erro ao buscar pedido.", status: 500 };
+  }
+
+  if (!pedidoData) {
+    return { ok: false, erro: "Pedido não encontrado.", status: 404 };
+  }
+
+  const pedido = mapPedidoRow(pedidoData as PedidoDbRow);
+
+  if (pedido.status !== "pendente") {
+    return {
+      ok: false,
+      erro: `Pedido não está pendente (status: ${pedido.status}).`,
+      status: 409,
+    };
+  }
+
+  const { data: itensData, error: itensError } = await supabase
+    .from("pedido_itens")
+    .select("*")
+    .eq("pedido_id", pedidoId);
+
+  if (itensError) {
+    if (process.env.NODE_ENV === "development") {
+      console.error("[buscarPedidoParaPagamento] pedido_itens:", itensError.message);
+    }
+    return { ok: false, erro: "Erro ao buscar itens do pedido.", status: 500 };
+  }
+
+  const itens = (itensData ?? []).map((row) => mapPedidoItemRow(row as PedidoItemDbRow));
+
+  return {
+    ok: true,
+    data: { pedido, itens },
+  };
+}
+
+export async function atualizarPagamentoMercadoPago(
+  pedidoId: string,
+  mpPaymentId: string,
+  mpStatus: string
+): Promise<{ ok: true } | { ok: false; erro: string }> {
+  let supabase;
+  try {
+    supabase = createServiceClient();
+  } catch (err) {
+    const message = err instanceof Error ? err.message : "Erro de configuração do servidor.";
+    return { ok: false, erro: message };
+  }
+
+  const { error } = await supabase
+    .from("pedidos")
+    .update({ mp_payment_id: mpPaymentId, mp_status: mpStatus })
+    .eq("id", pedidoId);
+
+  if (error) {
+    if (process.env.NODE_ENV === "development") {
+      console.error("[atualizarPagamentoMercadoPago]:", error.message);
+    }
+    return { ok: false, erro: "Erro ao atualizar pedido com dados do pagamento." };
+  }
+
+  return { ok: true };
 }
