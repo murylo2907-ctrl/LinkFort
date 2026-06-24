@@ -52,27 +52,8 @@
               <strong data-checkout-subtotal>R$ 0,00</strong>
             </div>
 
-            <div class="checkout-coupon">
-              <label class="checkout-coupon__label" for="coupon-input">Cupom de desconto</label>
-              <div class="checkout-coupon__row">
-                <input
-                  type="text"
-                  id="coupon-input"
-                  class="checkout-coupon__input"
-                  data-coupon-input
-                  placeholder="Ex.: SINDIMED15"
-                  autocomplete="off"
-                  maxlength="50"
-                >
-                <button type="button" class="btn btn-primary checkout-coupon__apply" data-coupon-apply>
-                  Aplicar
-                </button>
-              </div>
-              <p class="checkout-coupon__error" data-coupon-error hidden role="alert"></p>
-            </div>
-
             <div class="cart-summary__row cart-summary__row--discount" data-checkout-discount-row hidden>
-              <span>Desconto</span>
+              <span>Desconto <span data-checkout-coupon-code class="checkout-coupon-applied"></span></span>
               <strong data-checkout-discount>− R$ 0,00</strong>
             </div>
 

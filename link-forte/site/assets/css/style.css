@@ -833,7 +833,9 @@ body.lf-qv-open {
 .cart-empty[hidden],
 .cart-layout[hidden],
 .cart-empty.is-hidden,
-.cart-layout.is-hidden {
+.cart-layout.is-hidden,
+.cart-summary__row[hidden],
+.checkout-coupon__error[hidden] {
   display: none !important;
 }
 
@@ -1128,6 +1130,12 @@ body.lf-qv-open {
 
 .cart-summary__row--discount strong {
   color: #2e7d32;
+}
+
+.checkout-coupon-applied {
+  font-size: 0.85em;
+  font-weight: 600;
+  color: var(--text-muted, #666);
 }
 
 /* Benefits */
