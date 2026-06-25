@@ -53,6 +53,7 @@ writeFileSync(outPath, body, "utf8");
 console.log("supabase-config.js gerado para deploy.");
 
 let apiUrl = process.env.LF_API_BASE_URL?.trim();
+const mockApi = process.env.LF_MOCK_API?.trim();
 
 if (!apiUrl) {
   const apiSource = existsSync(apiLocalPath) ? apiLocalPath : apiExamplePath;
@@ -60,7 +61,15 @@ if (!apiUrl) {
   apiUrl = fromApiFile.apiUrl || "http://localhost:3001";
 }
 
+const useMockApi =
+  mockApi === "false" || mockApi === "0"
+    ? false
+    : mockApi === "true" || mockApi === "1"
+      ? true
+      : !apiUrl || apiUrl.includes("localhost");
+
 const apiBody = `// Gerado em deploy — não commitar (ver .gitignore)
+window.LF_MOCK_API = ${useMockApi};
 window.LF_API_BASE_URL = "${apiUrl}";
 `;
 

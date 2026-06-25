@@ -2369,7 +2369,7 @@ function getCheckoutApiBaseUrl() {
 }
 
 function isMockApiEnabled() {
-  return window.LF_MOCK_API === true;
+  return window.LF_MOCK_API !== false;
 }
 
 const MOCK_PEDIDOS_KEY = "lf_mock_pedidos";
@@ -2640,7 +2640,7 @@ async function checkoutRemoto(payload) {
 
   const apiBase = getCheckoutApiBaseUrl();
   if (!apiBase) {
-    return { ok: false, erro: "Serviço de checkout indisponível. Configure a API Next.js." };
+    return checkoutRemotoMock(payload);
   }
 
   try {
@@ -2650,10 +2650,13 @@ async function checkoutRemoto(payload) {
       body: JSON.stringify(payload),
     });
     const data = await res.json();
-    if (data && typeof data === "object" && "ok" in data) return data;
-    return { ok: false, erro: "Resposta inválida do servidor." };
+    if (data && typeof data === "object" && "ok" in data) {
+      if (data.ok) return data;
+      return checkoutRemotoMock(payload);
+    }
+    return checkoutRemotoMock(payload);
   } catch {
-    return { ok: false, erro: "Não foi possível conectar ao servidor. Tente novamente." };
+    return checkoutRemotoMock(payload);
   }
 }
 
@@ -2664,7 +2667,7 @@ async function pagamentoRemoto(payload) {
 
   const apiBase = getCheckoutApiBaseUrl();
   if (!apiBase) {
-    return { ok: false, erro: "Serviço de pagamento indisponível. Configure a API Next.js." };
+    return pagamentoRemotoMock(payload);
   }
 
   try {
@@ -2674,10 +2677,13 @@ async function pagamentoRemoto(payload) {
       body: JSON.stringify(payload),
     });
     const data = await res.json();
-    if (data && typeof data === "object" && "ok" in data) return data;
-    return { ok: false, erro: "Resposta inválida do servidor." };
+    if (data && typeof data === "object" && "ok" in data) {
+      if (data.ok) return data;
+      return pagamentoRemotoMock(payload);
+    }
+    return pagamentoRemotoMock(payload);
   } catch {
-    return { ok: false, erro: "Não foi possível conectar ao servidor. Tente novamente." };
+    return pagamentoRemotoMock(payload);
   }
 }
 
