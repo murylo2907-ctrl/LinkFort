@@ -483,8 +483,30 @@ function renderPromoAside(promo, { priceLine, whatsappHref } = {}) {
     </aside>`;
 }
 
+const DEFAULT_CERTIFICADOS_PROMO = {
+  title: "Acesse a loja",
+  text: "Configure tipo, modelo e validade — veja o preço na hora.",
+  cta: "Abrir configurador",
+  href: "loja.html#cotador-certificado",
+};
+
+const DEFAULT_SUPORTE_PROMO = {
+  title: "Fale agora no WhatsApp",
+  text: "Atendimento humanizado para tirar dúvidas e concluir sua compra.",
+  cta: "Iniciar conversa",
+  whatsappMessage: "Olá! Preciso de ajuda com certificado digital.",
+};
+
+const DEFAULT_SUPORTE_LINKS = [
+  { label: "Página de contato", href: "contato.html", icon: "mail", dataNav: "contato" },
+  { label: "Telefone (41) 3026-3491", href: "https://wa.me/554130263491", icon: "phone", external: true },
+  { label: "linkforte@linkforte.com.br", href: "mailto:linkforte@linkforte.com.br", icon: "mail", external: true },
+  { label: "Instagram", href: "https://www.instagram.com/linkforte", icon: "instagram", external: true },
+  { label: "Facebook", href: "https://www.facebook.com/linkforte", icon: "facebook", external: true },
+];
+
 function renderCertificadosPanel(groups, navConfig, lowest, basePath) {
-  const promo = navConfig?.certificados?.promo || {};
+  const promo = navConfig?.certificados?.promo || DEFAULT_CERTIFICADOS_PROMO;
   const priceLine = lowest ? `A partir de <strong>R$&nbsp;${lowest.priceMin}</strong>` : "";
   const promoHtml = renderPromoAside(
     { ...promo, href: promo.href || "loja.html#cotador-certificado", cta: promo.cta || "Abrir configurador" },
@@ -513,7 +535,7 @@ function renderCertificadosPanel(groups, navConfig, lowest, basePath) {
 
 function renderSuportePanel(navConfig, basePath) {
   const section = navConfig?.suporte || {};
-  const links = section.links || [];
+  const links = section.links?.length ? section.links : DEFAULT_SUPORTE_LINKS;
   const atendimento = links.filter((l) => !["whatsapp", "instagram", "facebook"].includes(l.icon));
   const social = links.filter((l) => ["instagram", "facebook"].includes(l.icon));
   const canais = [
@@ -525,8 +547,8 @@ function renderSuportePanel(navConfig, basePath) {
     },
     ...social,
   ];
-  const promo = section.promo || {};
-  const waMsg = promo.whatsappMessage || "Olá! Preciso de ajuda com certificado digital.";
+  const promo = section.promo?.title ? section.promo : DEFAULT_SUPORTE_PROMO;
+  const waMsg = promo.whatsappMessage || DEFAULT_SUPORTE_PROMO.whatsappMessage;
   const whatsappHref = `https://wa.me/${SITE.whatsapp}?text=${encodeURIComponent(waMsg)}`;
   const promoHtml = renderPromoAside({ ...promo, cta: promo.cta || "Iniciar conversa" }, { whatsappHref });
 

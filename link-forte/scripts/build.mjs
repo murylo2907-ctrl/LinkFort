@@ -222,6 +222,32 @@ for (const page of pagesRaw) {
   };
 }
 
+const DEFAULT_NAVIGATION = {
+  certificados: {
+    promo: {
+      title: "Acesse a loja",
+      text: "Configure tipo, modelo e validade — veja o preço na hora.",
+      cta: "Abrir configurador",
+      href: "loja.html#cotador-certificado",
+    },
+  },
+  suporte: {
+    promo: {
+      title: "Fale agora no WhatsApp",
+      text: "Atendimento humanizado para tirar dúvidas e concluir sua compra.",
+      cta: "Iniciar conversa",
+      whatsappMessage: "Olá! Preciso de ajuda com certificado digital.",
+    },
+    links: [
+      { label: "Página de contato", href: "contato.html", icon: "mail", dataNav: "contato" },
+      { label: "Telefone (41) 3026-3491", href: "https://wa.me/554130263491", icon: "phone", external: true },
+      { label: "linkforte@linkforte.com.br", href: "mailto:linkforte@linkforte.com.br", icon: "mail", external: true },
+      { label: "Instagram", href: "https://www.instagram.com/linkforte", icon: "instagram", external: true },
+      { label: "Facebook", href: "https://www.facebook.com/linkforte", icon: "facebook", external: true },
+    ],
+  },
+};
+
 const DEFAULT_PERSONAS = {
   title: "Qual é o seu perfil?",
   subtitle: "Escolha abaixo e vá direto ao conteúdo certo — sem precisar navegar pelo site",
@@ -297,7 +323,7 @@ const site = {
 };
 
 if (existingHero) site.hero = existingHero;
-if (existingNavigation) site.navigation = existingNavigation;
+site.navigation = existingNavigation || DEFAULT_NAVIGATION;
 site.personas = existingPersonas || DEFAULT_PERSONAS;
 if (existingAcquisitionSteps) site.acquisitionSteps = existingAcquisitionSteps;
 if (existingModelCompare) site.modelCompare = existingModelCompare;
