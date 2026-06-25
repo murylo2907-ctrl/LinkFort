@@ -2477,6 +2477,112 @@ function generateMockPixCode(pedidoId, amount) {
   return `00020126580014br.gov.bcb.pix0136${idPart}52040000530398654${amountStr.length}${amountStr}5802BR5913LINK FORTE LTDA6009CURITIBA62070503***6304MOCK`;
 }
 
+function addBusinessDays(date, days) {
+  const result = new Date(date);
+  let added = 0;
+  while (added < days) {
+    result.setDate(result.getDate() + 1);
+    const dow = result.getDay();
+    if (dow !== 0 && dow !== 6) added += 1;
+  }
+  return result;
+}
+
+function generateMockBoleto(pedidoId, amount, cliente) {
+  const dueDate = addBusinessDays(new Date(), 3);
+  const amountCents = Math.round(amount * 100);
+  const centsStr = String(amountCents).padStart(10, "0");
+  const seed = String(pedidoId).replace(/-/g, "").slice(0, 11).padEnd(11, "0");
+
+  const barcode = `23793.38128 60000.00000${seed.slice(0, 1)} 00000.00040${seed.slice(1, 4)} 1 ${centsStr}`;
+  const barcodeDigits = barcode.replace(/\D/g, "");
+
+  return {
+    barcode,
+    barcodeDigits,
+    dueDate: dueDate.toISOString(),
+    nossoNumero: seed.toUpperCase().slice(0, 11),
+    beneficiario: "LINK FORTE SOLUCOES DIGITAIS LTDA",
+    cnpjBeneficiario: "30.284.480/0001-20",
+    banco: "237 - Bradesco",
+    agencia: "1234-5",
+    conta: "67890-1",
+    pagador: cliente?.nome || "",
+    documentoPagador: cliente?.cpfCnpj || "",
+    valor: amount,
+    instrucoes: "Não receber após o vencimento. Videoconferência após compensação do boleto.",
+  };
+}
+
+function renderBoletoBarcodeVisual(container, barcodeDigits) {
+  if (!container) return;
+  container.innerHTML = "";
+  const digits = String(barcodeDigits || "").replace(/\D/g, "");
+  if (!digits) return;
+
+  digits.split("").forEach((digit, index) => {
+    const n = parseInt(digit, 10) || 0;
+    const bar = document.createElement("span");
+    bar.className = `checkout-boleto-bar${n % 2 === 0 ? " checkout-boleto-bar--wide" : ""}`;
+    container.appendChild(bar);
+    if (index < digits.length - 1) {
+      const gap = document.createElement("span");
+      gap.className = "checkout-boleto-bar-gap";
+      container.appendChild(gap);
+    }
+  });
+}
+
+function openBoletoPrintable(data, formatMoney) {
+  const dueStr = data.dueDate ? new Date(data.dueDate).toLocaleDateString("pt-BR") : "—";
+  const valorStr = formatMoney(data.amount ?? data.valor ?? 0);
+  const html = `<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8">
+  <title>Boleto - Link Forte</title>
+  <style>
+    body { font-family: Arial, sans-serif; margin: 24px; color: #111; }
+    .boleto { max-width: 720px; margin: 0 auto; border: 2px solid #000; }
+    .boleto__header { display: flex; justify-content: space-between; padding: 12px 16px; border-bottom: 1px solid #000; }
+    .boleto__bank { font-size: 1.5rem; font-weight: 700; }
+    .boleto__line { padding: 10px 16px; border-bottom: 1px solid #ccc; font-size: 0.85rem; }
+    .boleto__line strong { display: block; font-size: 0.7rem; color: #666; margin-bottom: 4px; text-transform: uppercase; }
+    .boleto__barcode { padding: 16px; text-align: center; font-family: monospace; font-size: 0.95rem; letter-spacing: 0.05em; word-break: break-all; }
+    .boleto__footer { padding: 12px 16px; font-size: 0.75rem; color: #666; }
+    @media print { body { margin: 0; } }
+  </style>
+</head>
+<body>
+  <div class="boleto">
+    <div class="boleto__header">
+      <div class="boleto__bank">${data.banco || "237 - Bradesco"}</div>
+      <div>${data.barcode || ""}</div>
+    </div>
+    <div class="boleto__line"><strong>Beneficiário</strong>${data.beneficiario || ""} — CNPJ ${data.cnpjBeneficiario || ""}</div>
+    <div class="boleto__line"><strong>Pagador</strong>${data.pagador || ""} ${data.documentoPagador ? `— ${data.documentoPagador}` : ""}</div>
+    <div class="boleto__line"><strong>Vencimento</strong>${dueStr}</div>
+    <div class="boleto__line"><strong>Valor do documento</strong>${valorStr}</div>
+    <div class="boleto__line"><strong>Nosso número</strong>${data.nossoNumero || ""}</div>
+    <div class="boleto__line"><strong>Instruções</strong>${data.instrucoes || ""}</div>
+    <div class="boleto__barcode">${data.barcodeDigits || data.barcode || ""}</div>
+    <div class="boleto__footer">Documento gerado para pagamento. Compense em qualquer banco, lotérica ou app até o vencimento.</div>
+  </div>
+  <script>window.onload = function() { window.print(); };</script>
+</body>
+</html>`;
+
+  const blob = new Blob([html], { type: "text/html;charset=utf-8" });
+  const url = URL.createObjectURL(blob);
+  const win = window.open(url, "_blank", "noopener");
+  if (!win) {
+    URL.revokeObjectURL(url);
+    return null;
+  }
+  setTimeout(() => URL.revokeObjectURL(url), 120000);
+  return url;
+}
+
 const CARD_BRANDS = {
   visa: { name: "Visa", pattern: /^4/, lengths: [13, 16, 19], cvvLength: 3 },
   mastercard: { name: "Mastercard", pattern: /^(5[1-5]|2[2-7])/, lengths: [16], cvvLength: 3 },
@@ -2709,14 +2815,14 @@ async function pagamentoRemotoMock(payload) {
   }
 
   if (pedido.forma_pagamento === "boleto") {
-    const cents = String(Math.round(pedido.total * 100)).padStart(10, "0");
+    const boletoData = generateMockBoleto(pedidoId, pedido.total, pedido.cliente);
+    updateMockPedido(pedidoId, { boleto: boletoData, status: "pending" });
     return {
       ok: true,
       forma: "boleto",
       paymentId: `mock_${pedidoId}`,
       amount: pedido.total,
-      ticketUrl: "#",
-      barcode: `23793.38128 60000.000003 00000.000400 1 ${cents}`,
+      ...boletoData,
       mock: true,
     };
   }
@@ -2794,6 +2900,80 @@ function fillPixPanel(root, data, formatMoney) {
   }
 
   bindPixCopyButton(copyBtn, pixCodeInput, copyFeedback);
+}
+
+function bindBoletoCopyButton(copyBtn, barcodeInput, copyFeedback) {
+  if (!copyBtn || copyBtn.dataset.boletoCopyBound === "true") return;
+  copyBtn.dataset.boletoCopyBound = "true";
+
+  copyBtn.addEventListener("click", async () => {
+    const code = barcodeInput?.value || barcodeInput?.textContent || "";
+    if (!code) return;
+    try {
+      await navigator.clipboard.writeText(code.replace(/\s/g, ""));
+      if (copyFeedback) {
+        copyFeedback.hidden = false;
+        setTimeout(() => {
+          copyFeedback.hidden = true;
+        }, 2500);
+      }
+    } catch {
+      if (barcodeInput?.select) {
+        barcodeInput.select();
+        document.execCommand("copy");
+      }
+    }
+  });
+}
+
+function fillBoletoPanel(root, data, formatMoney) {
+  const amountEl = root.querySelector("[data-payment-amount-boleto], [data-checkout-boleto-amount]");
+  const dueEl = root.querySelector("[data-payment-boleto-due], [data-checkout-boleto-due]");
+  const nossoNumeroEl = root.querySelector("[data-payment-boleto-nosso], [data-checkout-boleto-nosso]");
+  const barcodeEl = root.querySelector("[data-payment-barcode], [data-checkout-boleto-barcode]");
+  const barcodeInput = root.querySelector("[data-checkout-boleto-code], [data-payment-boleto-code]");
+  const barcodeVisual = root.querySelector("[data-checkout-boleto-barcode-visual], [data-payment-boleto-barcode-visual]");
+  const openBtn = root.querySelector("[data-payment-boleto-link], [data-checkout-boleto-open]");
+  const copyBtn = root.querySelector("[data-payment-copy-boleto], [data-checkout-boleto-copy]");
+  const copyFeedback = root.querySelector("[data-payment-boleto-copy-feedback], [data-checkout-boleto-copy-feedback]");
+  const pagadorRow = root.querySelector("[data-checkout-boleto-pagador-row]");
+  const pagadorEl = root.querySelector("[data-checkout-boleto-pagador-nome]");
+
+  const amount = data.amount ?? data.valor ?? 0;
+  if (amountEl) amountEl.textContent = formatMoney(amount);
+
+  if (dueEl && data.dueDate) {
+    dueEl.textContent = new Date(data.dueDate).toLocaleDateString("pt-BR");
+    dueEl.hidden = false;
+  }
+
+  if (nossoNumeroEl && data.nossoNumero) {
+    nossoNumeroEl.textContent = data.nossoNumero;
+    nossoNumeroEl.hidden = false;
+  }
+
+  if (pagadorEl && data.pagador) {
+    pagadorEl.textContent = data.pagador;
+    if (pagadorRow) pagadorRow.hidden = false;
+  }
+
+  const barcodeText = data.barcode || "";
+  if (barcodeEl) {
+    barcodeEl.textContent = barcodeText;
+    barcodeEl.hidden = !barcodeText;
+  }
+  if (barcodeInput) barcodeInput.value = barcodeText;
+
+  renderBoletoBarcodeVisual(barcodeVisual, data.barcodeDigits || barcodeText);
+
+  if (openBtn) {
+    openBtn.onclick = (e) => {
+      e.preventDefault();
+      openBoletoPrintable(data, formatMoney);
+    };
+  }
+
+  bindBoletoCopyButton(copyBtn, barcodeInput || barcodeEl, copyFeedback);
 }
 
 async function checkoutRemoto(payload) {
@@ -3112,8 +3292,10 @@ function initCheckoutPage() {
   const paymentOptions = document.querySelectorAll(".checkout-payment__option");
   const pixModalEl = document.getElementById("checkout-pix-modal");
   const cardModalEl = document.getElementById("checkout-card-modal");
+  const boletoModalEl = document.getElementById("checkout-boleto-modal");
   let pixModalInitialized = false;
   let cardModalInitialized = false;
+  let boletoModalInitialized = false;
   let pendingCardPedido = null;
 
   let appliedCouponCode = null;
@@ -3591,6 +3773,41 @@ function initCheckoutPage() {
     });
   }
 
+  function closeCheckoutBoletoModal() {
+    if (!boletoModalEl) return;
+    boletoModalEl.hidden = true;
+    boletoModalEl.setAttribute("aria-hidden", "true");
+    document.body.classList.remove("checkout-boleto-modal-open");
+  }
+
+  function openCheckoutBoletoModal(boletoData) {
+    if (!boletoModalEl) return;
+
+    const panel = boletoModalEl.querySelector(".checkout-boleto-modal__panel");
+    if (panel) fillBoletoPanel(panel, boletoData, formatMoney);
+
+    boletoModalEl.hidden = false;
+    boletoModalEl.setAttribute("aria-hidden", "false");
+    document.body.classList.add("checkout-boleto-modal-open");
+
+    boletoModalEl.querySelector("[data-checkout-boleto-open]")?.focus();
+  }
+
+  function initCheckoutBoletoModal() {
+    if (boletoModalInitialized || !boletoModalEl) return;
+    boletoModalInitialized = true;
+
+    boletoModalEl.querySelectorAll("[data-checkout-boleto-close]").forEach((el) => {
+      el.addEventListener("click", closeCheckoutBoletoModal);
+    });
+
+    document.addEventListener("keydown", (e) => {
+      if (e.key === "Escape" && boletoModalEl && !boletoModalEl.hidden) {
+        closeCheckoutBoletoModal();
+      }
+    });
+  }
+
   async function handleSubmit(e) {
     e.preventDefault();
     clearCheckoutError();
@@ -3658,6 +3875,20 @@ function initCheckoutPage() {
       } finally {
         resetSubmitButton();
       }
+      return;
+    }
+
+    if (formaPagamento === "boleto") {
+      const boletoResult = await pagamentoRemoto({ pedidoId: result.pedidoId, acao: "criar" });
+      if (!boletoResult.ok) {
+        showCheckoutError(boletoResult.erro || "Erro ao gerar boleto.");
+        resetSubmitButton();
+        return;
+      }
+
+      initCheckoutBoletoModal();
+      openCheckoutBoletoModal(boletoResult);
+      resetSubmitButton();
       return;
     }
 
@@ -3751,19 +3982,7 @@ function initPagamentoPage() {
 
   function showBoleto(data) {
     hideAllPanels();
-    const amountEl = document.querySelector("[data-payment-amount-boleto]");
-    const linkEl = document.querySelector("[data-payment-boleto-link]");
-    const barcodeEl = document.querySelector("[data-payment-barcode]");
-
-    if (amountEl) amountEl.textContent = formatMoney(data.amount);
-    if (linkEl && data.ticketUrl) {
-      linkEl.href = data.ticketUrl;
-    }
-    if (barcodeEl && data.barcode) {
-      barcodeEl.textContent = data.barcode;
-      barcodeEl.hidden = false;
-    }
-
+    fillBoletoPanel(document, data, formatMoney);
     boletoEl.hidden = false;
   }
 

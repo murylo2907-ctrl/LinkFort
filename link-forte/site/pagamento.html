@@ -71,9 +71,32 @@
             <p class="payment-panel__amount">Valor: <strong data-payment-amount-boleto>R$ 0,00</strong></p>
             <p class="payment-panel__hint">Clique no botão abaixo para abrir ou imprimir o boleto. A videoconferência será agendada após a compensação.</p>
           </div>
-          <a href="#" class="btn btn-primary payment-boleto__link" data-payment-boleto-link target="_blank" rel="noopener">
-            Abrir boleto
-          </a>
+
+          <div class="checkout-boleto-info">
+            <div class="checkout-boleto-info__row">
+              <span>Vencimento</span>
+              <strong data-payment-boleto-due>—</strong>
+            </div>
+            <div class="checkout-boleto-info__row">
+              <span>Nosso número</span>
+              <strong data-payment-boleto-nosso>—</strong>
+            </div>
+          </div>
+
+          <div class="checkout-boleto-barcode-visual" data-payment-boleto-barcode-visual aria-hidden="true"></div>
+
+          <div class="payment-boleto__copy">
+            <label class="payment-pix__label">Linha digitável</label>
+            <div class="payment-pix__copy-row">
+              <input type="text" class="payment-pix__input" data-payment-boleto-code readonly>
+              <button type="button" class="btn btn-secondary" data-payment-copy-boleto>Copiar</button>
+            </div>
+            <p class="payment-pix__copied" data-payment-boleto-copy-feedback hidden>Linha digitável copiada!</p>
+          </div>
+
+          <button type="button" class="btn btn-primary payment-boleto__link" data-payment-boleto-link>
+            Abrir boleto para impressão
+          </button>
           <p class="payment-boleto__barcode" data-payment-barcode hidden></p>
         </div>
 

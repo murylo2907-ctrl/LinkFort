@@ -261,6 +261,53 @@
     </div>
   </div>
 
+  <div id="checkout-boleto-modal" class="checkout-pix-modal checkout-boleto-modal" hidden aria-hidden="true">
+    <div class="checkout-pix-modal__backdrop" data-checkout-boleto-close tabindex="-1"></div>
+    <div class="checkout-pix-modal__dialog checkout-boleto-modal__dialog" role="dialog" aria-modal="true" aria-labelledby="checkout-boleto-title">
+      <button type="button" class="checkout-pix-modal__close" data-checkout-boleto-close aria-label="Fechar">&times;</button>
+      <div class="payment-panel checkout-boleto-modal__panel">
+        <div class="payment-panel__header">
+          <span class="payment-panel__mock-badge">Boleto gerado</span>
+          <h2 id="checkout-boleto-title">Boleto bancário</h2>
+          <p class="payment-panel__amount">Valor: <strong data-checkout-boleto-amount>R$ 0,00</strong></p>
+          <p class="payment-panel__hint">Pague em qualquer banco, lotérica ou app. A videoconferência será agendada após a compensação.</p>
+        </div>
+
+        <div class="checkout-boleto-info">
+          <div class="checkout-boleto-info__row">
+            <span>Vencimento</span>
+            <strong data-checkout-boleto-due>—</strong>
+          </div>
+          <div class="checkout-boleto-info__row">
+            <span>Nosso número</span>
+            <strong data-checkout-boleto-nosso>—</strong>
+          </div>
+          <div class="checkout-boleto-info__row checkout-boleto-info__row--pagador" data-checkout-boleto-pagador-row hidden>
+            <span>Pagador</span>
+            <strong data-checkout-boleto-pagador-nome></strong>
+          </div>
+        </div>
+
+        <div class="checkout-boleto-barcode-visual" data-checkout-boleto-barcode-visual aria-hidden="true"></div>
+
+        <div class="payment-boleto__copy">
+          <label class="payment-pix__label" for="checkout-boleto-code">Linha digitável</label>
+          <div class="payment-pix__copy-row">
+            <input type="text" id="checkout-boleto-code" class="payment-pix__input" data-checkout-boleto-code readonly>
+            <button type="button" class="btn btn-secondary" data-checkout-boleto-copy>Copiar</button>
+          </div>
+          <p class="payment-pix__copied" data-checkout-boleto-copy-feedback hidden>Linha digitável copiada!</p>
+        </div>
+
+        <p class="payment-boleto__barcode" data-checkout-boleto-barcode hidden></p>
+
+        <button type="button" class="btn btn-primary payment-boleto__link" data-checkout-boleto-open>
+          Abrir boleto para impressão
+        </button>
+      </div>
+    </div>
+  </div>
+
   <script src="assets/js/cart.js"></script>
   <script src="assets/js/supabase-config.js" onerror="this.onerror=null;this.src='assets/js/supabase-config.example.js'"></script>
   <script src="assets/js/api-config.js" onerror="this.onerror=null;this.src='assets/js/api-config.example.js'"></script>
