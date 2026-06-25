@@ -2226,3 +2226,184 @@ body.lf-qv-open {
 body.checkout-pix-modal-open {
   overflow: hidden;
 }
+
+body.checkout-card-modal-open {
+  overflow: hidden;
+}
+
+/* Modal cartão no checkout */
+.checkout-card-modal__dialog {
+  max-width: 520px;
+}
+
+.checkout-card-secure {
+  display: flex;
+  align-items: flex-start;
+  gap: 0.5rem;
+  font-size: 0.85rem;
+  color: #2e7d32;
+  background: #e8f5e9;
+  padding: 0.625rem 0.75rem;
+  border-radius: var(--radius, 8px);
+  margin-top: 0.75rem;
+}
+
+.checkout-card-preview {
+  position: relative;
+  margin: 1.25rem 0 1.5rem;
+  padding: 1.25rem 1.25rem 1rem;
+  border-radius: 14px;
+  min-height: 180px;
+  background: linear-gradient(135deg, #1a237e 0%, #3949ab 50%, #5c6bc0 100%);
+  color: #fff;
+  box-shadow: 0 12px 28px rgba(26, 35, 126, 0.35);
+  overflow: hidden;
+}
+
+.checkout-card-preview[data-brand="visa"] {
+  background: linear-gradient(135deg, #0d47a1 0%, #1565c0 50%, #42a5f5 100%);
+}
+
+.checkout-card-preview[data-brand="mastercard"] {
+  background: linear-gradient(135deg, #1a1a1a 0%, #4a4a4a 50%, #c62828 100%);
+}
+
+.checkout-card-preview[data-brand="amex"] {
+  background: linear-gradient(135deg, #004d40 0%, #00695c 50%, #26a69a 100%);
+}
+
+.checkout-card-preview__chip {
+  width: 42px;
+  height: 32px;
+  border-radius: 6px;
+  background: linear-gradient(145deg, #f5d76e, #c9a227);
+  margin-bottom: 1.25rem;
+}
+
+.checkout-card-preview__number {
+  font-family: "Courier New", Courier, monospace;
+  font-size: 1.2rem;
+  letter-spacing: 0.12em;
+  margin-bottom: 1.25rem;
+  word-spacing: 0.25rem;
+}
+
+.checkout-card-preview__footer {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-end;
+  gap: 1rem;
+  font-size: 0.8rem;
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+}
+
+.checkout-card-preview__name {
+  flex: 1;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.checkout-card-preview__brand {
+  position: absolute;
+  top: 1rem;
+  right: 1rem;
+  font-size: 0.75rem;
+  font-weight: 800;
+  letter-spacing: 0.08em;
+  opacity: 0.9;
+}
+
+.checkout-card-form__row {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 1rem;
+}
+
+.checkout-card-form__submit {
+  width: 100%;
+  margin-top: 0.5rem;
+}
+
+.checkout-card-form select {
+  width: 100%;
+  padding: 0.75rem 1rem;
+  border: 1px solid #ddd;
+  border-radius: var(--radius, 8px);
+  font-family: inherit;
+  font-size: 1rem;
+  background: #fff;
+}
+
+.checkout-card-field-error {
+  color: #c62828;
+  font-size: 0.8rem;
+  margin-top: 0.35rem;
+}
+
+.checkout-card-field-error[hidden] {
+  display: none !important;
+}
+
+.checkout-card-processing {
+  text-align: center;
+  padding: 2.5rem 1rem;
+}
+
+.checkout-card-processing__spinner {
+  width: 48px;
+  height: 48px;
+  margin: 0 auto 1.25rem;
+  border: 4px solid #e0e0e0;
+  border-top-color: var(--primary, #0066cc);
+  border-radius: 50%;
+  animation: checkout-card-spin 0.8s linear infinite;
+}
+
+@keyframes checkout-card-spin {
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+.checkout-card-processing h2 {
+  font-size: 1.25rem;
+  margin-bottom: 0.5rem;
+}
+
+.checkout-card-processing p {
+  color: var(--text-muted, #666);
+  line-height: 1.5;
+}
+
+.checkout-card-success {
+  text-align: center;
+  padding: 1.5rem 0.5rem;
+}
+
+.checkout-card-success__icon {
+  width: 64px;
+  height: 64px;
+  margin: 0 auto 1rem;
+  border-radius: 50%;
+  background: #e8f5e9;
+  color: #2e7d32;
+  font-size: 2rem;
+  font-weight: 700;
+  line-height: 64px;
+}
+
+.checkout-card-success .btn {
+  margin-top: 1.25rem;
+}
+
+@media (max-width: 480px) {
+  .checkout-card-form__row {
+    grid-template-columns: 1fr;
+  }
+
+  .checkout-card-preview__number {
+    font-size: 1rem;
+  }
+}

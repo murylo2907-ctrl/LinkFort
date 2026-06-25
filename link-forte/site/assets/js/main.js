@@ -2477,6 +2477,159 @@ function generateMockPixCode(pedidoId, amount) {
   return `00020126580014br.gov.bcb.pix0136${idPart}52040000530398654${amountStr.length}${amountStr}5802BR5913LINK FORTE LTDA6009CURITIBA62070503***6304MOCK`;
 }
 
+const CARD_BRANDS = {
+  visa: { name: "Visa", pattern: /^4/, lengths: [13, 16, 19], cvvLength: 3 },
+  mastercard: { name: "Mastercard", pattern: /^(5[1-5]|2[2-7])/, lengths: [16], cvvLength: 3 },
+  amex: { name: "American Express", pattern: /^3[47]/, lengths: [15], cvvLength: 4 },
+  elo: { name: "Elo", pattern: /^(4011|4312|4389|4514|4576|5041|5066|5090|6277|6362|6363|6504|6505|6516)/, lengths: [16], cvvLength: 3 },
+  hipercard: { name: "Hipercard", pattern: /^(38|60)/, lengths: [13, 16, 19], cvvLength: 3 },
+};
+
+const CARD_BRAND_GENERIC = {
+  id: "generic",
+  name: "Cartão",
+  pattern: /.*/,
+  lengths: [16],
+  cvvLength: 3,
+};
+
+function detectCardBrand(number) {
+  const digits = String(number || "").replace(/\D/g, "");
+  if (!digits) return CARD_BRAND_GENERIC;
+  for (const [id, brand] of Object.entries(CARD_BRANDS)) {
+    if (brand.pattern.test(digits)) return { id, ...brand };
+  }
+  return CARD_BRAND_GENERIC;
+}
+
+function luhnCheck(number) {
+  const digits = String(number || "").replace(/\D/g, "");
+  if (digits.length < 13) return false;
+  let sum = 0;
+  let alt = false;
+  for (let i = digits.length - 1; i >= 0; i -= 1) {
+    let n = parseInt(digits[i], 10);
+    if (alt) {
+      n *= 2;
+      if (n > 9) n -= 9;
+    }
+    sum += n;
+    alt = !alt;
+  }
+  return sum % 10 === 0;
+}
+
+function formatCardNumber(value) {
+  const digits = String(value || "").replace(/\D/g, "").slice(0, 19);
+  const brand = detectCardBrand(digits);
+  const maxLen = Math.max(...brand.lengths);
+  const trimmed = digits.slice(0, maxLen);
+  if (brand.id === "amex") {
+    return trimmed.replace(/^(\d{0,4})(\d{0,6})(\d{0,5}).*/, (_, a, b, c) => [a, b, c].filter(Boolean).join(" "));
+  }
+  return trimmed.replace(/(\d{4})(?=\d)/g, "$1 ").trim();
+}
+
+function formatCardExpiry(value) {
+  const digits = String(value || "").replace(/\D/g, "").slice(0, 4);
+  if (digits.length <= 2) return digits;
+  return `${digits.slice(0, 2)}/${digits.slice(2)}`;
+}
+
+function parseCardExpiry(value) {
+  const match = String(value || "").match(/^(\d{2})\s*\/\s*(\d{2})$/);
+  if (!match) return null;
+  const month = parseInt(match[1], 10);
+  const year = 2000 + parseInt(match[2], 10);
+  if (month < 1 || month > 12) return null;
+  const expiry = new Date(year, month, 0, 23, 59, 59);
+  if (expiry < new Date()) return null;
+  return { month, year };
+}
+
+function maskCardPreviewNumber(value) {
+  const digits = String(value || "").replace(/\D/g, "");
+  if (!digits) return "•••• •••• •••• ••••";
+  const brand = detectCardBrand(digits);
+  const maxLen = Math.max(...brand.lengths);
+  const padded = digits.padEnd(maxLen, "•");
+  if (brand.id === "amex") {
+    return `${padded.slice(0, 4)} ${padded.slice(4, 10)} ${padded.slice(10, 15)}`.replace(/•/g, "•");
+  }
+  return padded.replace(/(.{4})/g, "$1 ").trim();
+}
+
+async function tokenizeCardSecure(cardNumber) {
+  const digits = String(cardNumber || "").replace(/\D/g, "");
+  const payload = `${digits}:${Date.now()}:${crypto.randomUUID()}`;
+  if (crypto.subtle) {
+    const encoded = new TextEncoder().encode(payload);
+    const hash = await crypto.subtle.digest("SHA-256", encoded);
+    const token = Array.from(new Uint8Array(hash))
+      .map((b) => b.toString(16).padStart(2, "0"))
+      .join("")
+      .slice(0, 32);
+    return `tok_${token}`;
+  }
+  let hash = 0;
+  for (let i = 0; i < payload.length; i += 1) {
+    hash = (hash << 5) - hash + payload.charCodeAt(i);
+    hash |= 0;
+  }
+  return `tok_${Math.abs(hash).toString(16)}${Date.now().toString(16)}`;
+}
+
+function validateCardForm(fields) {
+  const number = String(fields.number || "").replace(/\D/g, "");
+  const holder = String(fields.holder || "").trim();
+  const expiry = String(fields.expiry || "").trim();
+  const cvv = String(fields.cvv || "").replace(/\D/g, "");
+  const installments = parseInt(fields.installments, 10);
+
+  if (!holder || holder.length < 3) {
+    return { valid: false, field: "cardHolder", message: "Informe o nome impresso no cartão." };
+  }
+
+  const brand = detectCardBrand(number);
+  if (!brand.lengths.includes(number.length)) {
+    return { valid: false, field: "cardNumber", message: `Número inválido para ${brand.name}.` };
+  }
+
+  if (!luhnCheck(number)) {
+    return { valid: false, field: "cardNumber", message: "Número do cartão inválido." };
+  }
+
+  if (!parseCardExpiry(expiry)) {
+    return { valid: false, field: "cardExpiry", message: "Validade inválida ou expirada (use MM/AA)." };
+  }
+
+  if (cvv.length !== brand.cvvLength) {
+    return {
+      valid: false,
+      field: "cardCvv",
+      message: `CVV deve ter ${brand.cvvLength} dígitos.`,
+    };
+  }
+
+  if (!installments || installments < 1 || installments > 3) {
+    return { valid: false, field: "installments", message: "Selecione o número de parcelas." };
+  }
+
+  return { valid: true, brand, number, holder, expiry, cvv, installments };
+}
+
+function updateMockPedido(pedidoId, updates) {
+  const pedido = getMockPedido(pedidoId);
+  if (!pedido) return false;
+  saveMockPedido({ ...pedido, ...updates });
+  return true;
+}
+
+async function simulateCardProcessing() {
+  const delay = 1500 + Math.random() * 1200;
+  await new Promise((resolve) => setTimeout(resolve, delay));
+}
+
 async function checkoutRemotoMock(payload) {
   await Promise.resolve();
 
@@ -2521,12 +2674,22 @@ async function pagamentoRemotoMock(payload) {
   }
 
   if (payload.acao === "confirmar" && pedido.forma_pagamento === "cartao") {
+    if (payload.cartaoToken) {
+      updateMockPedido(pedidoId, {
+        cartao: payload.cartaoToken,
+        status: "approved",
+        paid_at: new Date().toISOString(),
+      });
+    }
     return {
       ok: true,
       forma: "cartao",
       paymentId: `mock_${pedidoId}`,
       amount: pedido.total,
       status: "approved",
+      parcelas: payload.cartaoToken?.parcelas || 1,
+      ultimos4: payload.cartaoToken?.ultimos4 || "",
+      mock: true,
     };
   }
 
@@ -2948,7 +3111,10 @@ function initCheckoutPage() {
   const submitBtn = document.querySelector("[data-checkout-submit]");
   const paymentOptions = document.querySelectorAll(".checkout-payment__option");
   const pixModalEl = document.getElementById("checkout-pix-modal");
+  const cardModalEl = document.getElementById("checkout-card-modal");
   let pixModalInitialized = false;
+  let cardModalInitialized = false;
+  let pendingCardPedido = null;
 
   let appliedCouponCode = null;
   let currentResumo = null;
@@ -3184,6 +3350,247 @@ function initCheckoutPage() {
     });
   }
 
+  function closeCheckoutCardModal() {
+    if (!cardModalEl) return;
+    cardModalEl.hidden = true;
+    cardModalEl.setAttribute("aria-hidden", "true");
+    document.body.classList.remove("checkout-card-modal-open");
+    pendingCardPedido = null;
+    const form = cardModalEl.querySelector("#checkout-card-form");
+    form?.reset();
+    cardModalEl.querySelectorAll("[data-card-step]").forEach((step) => {
+      step.hidden = step.dataset.cardStep !== "form";
+    });
+    cardModalEl.querySelectorAll(".checkout-card-field-error").forEach((el) => {
+      el.hidden = true;
+      el.textContent = "";
+    });
+    cardModalEl.querySelectorAll(".checkout-input--invalid").forEach((el) => {
+      el.classList.remove("checkout-input--invalid");
+    });
+  }
+
+  function setCardModalStep(stepName) {
+    if (!cardModalEl) return;
+    cardModalEl.querySelectorAll("[data-card-step]").forEach((step) => {
+      step.hidden = step.dataset.cardStep !== stepName;
+    });
+  }
+
+  function showCardFieldError(fieldName, message) {
+    const input = cardModalEl?.querySelector(`[name="${fieldName}"]`);
+    const error = cardModalEl?.querySelector(`[data-card-field-error="${fieldName}"]`);
+    if (input) input.classList.add("checkout-input--invalid");
+    if (error) {
+      error.textContent = message;
+      error.hidden = false;
+    }
+    input?.focus();
+  }
+
+  function clearCardFieldErrors() {
+    cardModalEl?.querySelectorAll("[data-card-field-error]").forEach((el) => {
+      el.hidden = true;
+      el.textContent = "";
+    });
+    cardModalEl?.querySelectorAll(".checkout-input--invalid").forEach((el) => {
+      el.classList.remove("checkout-input--invalid");
+    });
+  }
+
+  function updateCardPreview() {
+    if (!cardModalEl) return;
+    const numberInput = cardModalEl.querySelector('[name="cardNumber"]');
+    const holderInput = cardModalEl.querySelector('[name="cardHolder"]');
+    const expiryInput = cardModalEl.querySelector('[name="cardExpiry"]');
+
+    const numberEl = cardModalEl.querySelector("[data-card-preview-number]");
+    const nameEl = cardModalEl.querySelector("[data-card-preview-name]");
+    const expiryEl = cardModalEl.querySelector("[data-card-preview-expiry]");
+    const brandEl = cardModalEl.querySelector("[data-card-preview-brand]");
+    const preview = cardModalEl.querySelector(".checkout-card-preview");
+
+    const digits = String(numberInput?.value || "").replace(/\D/g, "");
+    const brand = detectCardBrand(digits);
+
+    if (numberEl) numberEl.textContent = maskCardPreviewNumber(numberInput?.value || "");
+    if (nameEl) {
+      nameEl.textContent = (holderInput?.value || "NOME NO CARTÃO").toUpperCase().slice(0, 26);
+    }
+    if (expiryEl) {
+      expiryEl.textContent = expiryInput?.value || "MM/AA";
+    }
+    if (brandEl) {
+      brandEl.textContent = digits && brand ? brand.name.toUpperCase() : "";
+      brandEl.hidden = !digits;
+    }
+    if (preview && brand) {
+      preview.dataset.brand = brand.id;
+    }
+  }
+
+  function fillInstallmentOptions(total) {
+    const select = cardModalEl?.querySelector('[name="installments"]');
+    if (!select) return;
+    select.innerHTML = "";
+    for (let n = 1; n <= 3; n += 1) {
+      const parcela = roundMoney(total / n);
+      const option = document.createElement("option");
+      option.value = String(n);
+      option.textContent =
+        n === 1
+          ? `1x de ${formatMoney(total)} sem juros`
+          : `${n}x de ${formatMoney(parcela)} sem juros`;
+      select.appendChild(option);
+    }
+  }
+
+  function openCheckoutCardModal(checkoutResult) {
+    if (!cardModalEl) return;
+
+    pendingCardPedido = checkoutResult;
+    const total = checkoutResult.resumo?.total || 0;
+
+    const amountEl = cardModalEl.querySelector("[data-checkout-card-amount]");
+    if (amountEl) amountEl.textContent = formatMoney(total);
+
+    fillInstallmentOptions(total);
+    setCardModalStep("form");
+    clearCardFieldErrors();
+    updateCardPreview();
+
+    cardModalEl.hidden = false;
+    cardModalEl.setAttribute("aria-hidden", "false");
+    document.body.classList.add("checkout-card-modal-open");
+
+    cardModalEl.querySelector('[name="cardNumber"]')?.focus();
+  }
+
+  async function handleCardFormSubmit(e) {
+    e.preventDefault();
+    if (!pendingCardPedido?.pedidoId) return;
+
+    clearCardFieldErrors();
+
+    const form = e.target;
+    const formData = new FormData(form);
+    const validation = validateCardForm({
+      number: formData.get("cardNumber"),
+      holder: formData.get("cardHolder"),
+      expiry: formData.get("cardExpiry"),
+      cvv: formData.get("cardCvv"),
+      installments: formData.get("installments"),
+    });
+
+    if (!validation.valid) {
+      showCardFieldError(validation.field, validation.message);
+      return;
+    }
+
+    const payBtn = cardModalEl?.querySelector("[data-checkout-card-pay]");
+    if (payBtn) {
+      payBtn.disabled = true;
+      payBtn.textContent = "Processando…";
+    }
+
+    setCardModalStep("processing");
+
+    try {
+      await simulateCardProcessing();
+
+      const token = await tokenizeCardSecure(validation.number);
+      const ultimos4 = validation.number.slice(-4);
+      const cartaoToken = {
+        token,
+        ultimos4,
+        bandeira: validation.brand.id,
+        bandeira_nome: validation.brand.name,
+        titular: validation.holder.toUpperCase(),
+        validade: validation.expiry,
+        parcelas: validation.installments,
+        valor_parcela: roundMoney(pendingCardPedido.resumo.total / validation.installments),
+        tokenizado_em: new Date().toISOString(),
+      };
+
+      const result = await pagamentoRemoto({
+        pedidoId: pendingCardPedido.pedidoId,
+        acao: "confirmar",
+        cartaoToken,
+      });
+
+      if (!result.ok) {
+        setCardModalStep("form");
+        showCardFieldError("cardNumber", result.erro || "Não foi possível processar o pagamento.");
+        return;
+      }
+
+      const successAmount = cardModalEl?.querySelector("[data-checkout-card-success-amount]");
+      const successDetail = cardModalEl?.querySelector("[data-checkout-card-success-detail]");
+      if (successAmount) successAmount.textContent = formatMoney(result.amount);
+      if (successDetail) {
+        successDetail.textContent = `Cartão ${validation.brand.name} final ${ultimos4} · ${result.parcelas}x aprovado`;
+      }
+
+      if (typeof limparCarrinho === "function") limparCarrinho();
+
+      form.reset();
+      updateCardPreview();
+      setCardModalStep("success");
+    } finally {
+      if (payBtn) {
+        payBtn.disabled = false;
+        payBtn.textContent = "Pagar agora";
+      }
+    }
+  }
+
+  function initCheckoutCardModal() {
+    if (cardModalInitialized || !cardModalEl) return;
+    cardModalInitialized = true;
+
+    const form = cardModalEl.querySelector("#checkout-card-form");
+    form?.addEventListener("submit", handleCardFormSubmit);
+
+    cardModalEl.querySelectorAll("[data-checkout-card-close]").forEach((el) => {
+      el.addEventListener("click", closeCheckoutCardModal);
+    });
+
+    cardModalEl.querySelector("[data-checkout-card-success-home]")?.addEventListener("click", () => {
+      window.location.href = navHref("index.html", getBasePath());
+    });
+
+    form?.addEventListener("input", (ev) => {
+      const target = ev.target;
+      if (!(target instanceof HTMLInputElement)) return;
+
+      if (target.name === "cardNumber") {
+        target.value = formatCardNumber(target.value);
+      }
+      if (target.name === "cardExpiry") {
+        target.value = formatCardExpiry(target.value);
+      }
+      if (target.name === "cardCvv") {
+        target.value = target.value.replace(/\D/g, "").slice(0, 4);
+      }
+
+      target.classList.remove("checkout-input--invalid");
+      const error = cardModalEl.querySelector(`[data-card-field-error="${target.name}"]`);
+      if (error) {
+        error.hidden = true;
+        error.textContent = "";
+      }
+      updateCardPreview();
+    });
+
+    document.addEventListener("keydown", (e) => {
+      if (e.key === "Escape" && cardModalEl && !cardModalEl.hidden) {
+        const processing = cardModalEl.querySelector('[data-card-step="processing"]');
+        if (processing && !processing.hidden) return;
+        closeCheckoutCardModal();
+      }
+    });
+  }
+
   async function handleSubmit(e) {
     e.preventDefault();
     clearCheckoutError();
@@ -3238,6 +3645,19 @@ function initCheckoutPage() {
       initCheckoutPixModal();
       openCheckoutPixModal(pixResult);
       resetSubmitButton();
+      return;
+    }
+
+    if (formaPagamento === "cartao") {
+      try {
+        initCheckoutCardModal();
+        openCheckoutCardModal(result);
+      } catch (err) {
+        console.error(err);
+        showCheckoutError("Não foi possível abrir o pagamento com cartão. Tente novamente.");
+      } finally {
+        resetSubmitButton();
+      }
       return;
     }
 

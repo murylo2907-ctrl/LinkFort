@@ -178,6 +178,89 @@
     </div>
   </div>
 
+  <div id="checkout-card-modal" class="checkout-pix-modal checkout-card-modal" hidden aria-hidden="true">
+    <div class="checkout-pix-modal__backdrop" data-checkout-card-close tabindex="-1"></div>
+    <div class="checkout-pix-modal__dialog checkout-card-modal__dialog" role="dialog" aria-modal="true" aria-labelledby="checkout-card-title">
+      <button type="button" class="checkout-pix-modal__close" data-checkout-card-close aria-label="Fechar">&times;</button>
+
+      <div class="payment-panel checkout-card-modal__panel">
+        <div data-card-step="form">
+          <div class="payment-panel__header">
+            <span class="payment-panel__mock-badge">Pagamento seguro</span>
+            <h2 id="checkout-card-title">Cartão de crédito</h2>
+            <p class="payment-panel__amount">Total: <strong data-checkout-card-amount>R$ 0,00</strong></p>
+            <p class="payment-panel__hint checkout-card-secure">
+              <span class="checkout-card-secure__icon" aria-hidden="true">🔒</span>
+              Seus dados são tokenizados no navegador. Número completo e CVV não são armazenados.
+            </p>
+          </div>
+
+          <div class="checkout-card-preview" data-brand="generic">
+            <div class="checkout-card-preview__chip" aria-hidden="true"></div>
+            <div class="checkout-card-preview__number" data-card-preview-number>•••• •••• •••• ••••</div>
+            <div class="checkout-card-preview__footer">
+              <span class="checkout-card-preview__name" data-card-preview-name>NOME NO CARTÃO</span>
+              <span class="checkout-card-preview__expiry" data-card-preview-expiry>MM/AA</span>
+            </div>
+            <span class="checkout-card-preview__brand" data-card-preview-brand hidden></span>
+          </div>
+
+          <form id="checkout-card-form" class="checkout-card-form" novalidate autocomplete="on">
+            <div class="form-group">
+              <label for="checkout-card-number">Número do cartão</label>
+              <input type="text" id="checkout-card-number" name="cardNumber" inputmode="numeric" autocomplete="cc-number" placeholder="0000 0000 0000 0000" maxlength="19" required>
+              <p class="checkout-card-field-error" data-card-field-error="cardNumber" hidden role="alert"></p>
+            </div>
+
+            <div class="form-group">
+              <label for="checkout-card-holder">Nome no cartão</label>
+              <input type="text" id="checkout-card-holder" name="cardHolder" autocomplete="cc-name" placeholder="Como impresso no cartão" maxlength="26" required>
+              <p class="checkout-card-field-error" data-card-field-error="cardHolder" hidden role="alert"></p>
+            </div>
+
+            <div class="checkout-card-form__row">
+              <div class="form-group">
+                <label for="checkout-card-expiry">Validade</label>
+                <input type="text" id="checkout-card-expiry" name="cardExpiry" inputmode="numeric" autocomplete="cc-exp" placeholder="MM/AA" maxlength="5" required>
+                <p class="checkout-card-field-error" data-card-field-error="cardExpiry" hidden role="alert"></p>
+              </div>
+              <div class="form-group">
+                <label for="checkout-card-cvv">CVV</label>
+                <input type="password" id="checkout-card-cvv" name="cardCvv" inputmode="numeric" autocomplete="cc-csc" placeholder="•••" maxlength="4" required>
+                <p class="checkout-card-field-error" data-card-field-error="cardCvv" hidden role="alert"></p>
+              </div>
+            </div>
+
+            <div class="form-group">
+              <label for="checkout-card-installments">Parcelas</label>
+              <select id="checkout-card-installments" name="installments" required></select>
+              <p class="checkout-card-field-error" data-card-field-error="installments" hidden role="alert"></p>
+            </div>
+
+            <button type="submit" class="btn-comprar checkout-card-form__submit" data-checkout-card-pay>
+              Pagar agora
+            </button>
+          </form>
+        </div>
+
+        <div data-card-step="processing" hidden class="checkout-card-processing">
+          <div class="checkout-card-processing__spinner" aria-hidden="true"></div>
+          <h2>Processando pagamento</h2>
+          <p>Estamos validando seu cartão com segurança. Não feche esta janela.</p>
+        </div>
+
+        <div data-card-step="success" hidden class="checkout-card-success payment-panel--success">
+          <div class="checkout-card-success__icon" aria-hidden="true">✓</div>
+          <h2>Pagamento aprovado!</h2>
+          <p class="payment-panel__amount"><strong data-checkout-card-success-amount>R$ 0,00</strong></p>
+          <p class="payment-panel__hint" data-checkout-card-success-detail></p>
+          <p class="payment-panel__hint">Em breve entraremos em contato para agendar a videoconferência.</p>
+          <button type="button" class="btn btn-primary" data-checkout-card-success-home>Voltar ao início</button>
+        </div>
+      </div>
+    </div>
+  </div>
+
   <script src="assets/js/cart.js"></script>
   <script src="assets/js/supabase-config.js" onerror="this.onerror=null;this.src='assets/js/supabase-config.example.js'"></script>
   <script src="assets/js/api-config.js" onerror="this.onerror=null;this.src='assets/js/api-config.example.js'"></script>
