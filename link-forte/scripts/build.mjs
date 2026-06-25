@@ -222,6 +222,63 @@ for (const page of pagesRaw) {
   };
 }
 
+const DEFAULT_NAVIGATION = {
+  certificados: {
+    promo: {
+      title: "Acesse a loja",
+      text: "Configure tipo, modelo e validade — veja o preço na hora.",
+      cta: "Abrir configurador",
+      href: "loja.html#cotador-certificado",
+    },
+  },
+  suporte: {
+    promo: {
+      title: "Fale agora no WhatsApp",
+      text: "Atendimento humanizado para tirar dúvidas e concluir sua compra.",
+      cta: "Iniciar conversa",
+      whatsappMessage: "Olá! Preciso de ajuda com certificado digital.",
+    },
+    links: [
+      { label: "Página de contato", href: "contato.html", icon: "mail", dataNav: "contato" },
+      { label: "Telefone (41) 3026-3491", href: "https://wa.me/554130263491", icon: "phone", external: true },
+      { label: "linkforte@linkforte.com.br", href: "mailto:linkforte@linkforte.com.br", icon: "mail", external: true },
+      { label: "Instagram", href: "https://www.instagram.com/linkforte", icon: "instagram", external: true },
+      { label: "Facebook", href: "https://www.facebook.com/linkforte", icon: "facebook", external: true },
+    ],
+  },
+};
+
+const DEFAULT_PERSONAS = {
+  title: "Qual é o seu perfil?",
+  subtitle: "Escolha abaixo e vá direto ao conteúdo certo — sem precisar navegar pelo site",
+  items: [
+    {
+      id: "pf",
+      title: "Pessoa Física",
+      description: "e-CPF para IR, eSocial, assinatura digital e serviços gov.br",
+      cta: "Configurar e-CPF",
+      href: "loja.html?tipo=ecpf#cotador-certificado",
+      icon: "user",
+    },
+    {
+      id: "pj",
+      title: "Pessoa Jurídica",
+      description: "e-CNPJ para NF-e, SPED, contratos e obrigações da empresa",
+      cta: "Configurar e-CNPJ",
+      href: "loja.html?tipo=ecnpj#cotador-certificado",
+      icon: "building",
+    },
+    {
+      id: "contador",
+      title: "Contador",
+      description: "Emissão para clientes PF e PJ com atendimento especializado",
+      cta: "Falar com especialista",
+      href: "contato.html?perfil=contador",
+      icon: "calculator",
+    },
+  ],
+};
+
 const sitePath = path.join(dataDir, "site.json");
 let existingHero;
 let existingNavigation;
@@ -266,8 +323,8 @@ const site = {
 };
 
 if (existingHero) site.hero = existingHero;
-if (existingNavigation) site.navigation = existingNavigation;
-if (existingPersonas) site.personas = existingPersonas;
+site.navigation = existingNavigation || DEFAULT_NAVIGATION;
+site.personas = existingPersonas || DEFAULT_PERSONAS;
 if (existingAcquisitionSteps) site.acquisitionSteps = existingAcquisitionSteps;
 if (existingModelCompare) site.modelCompare = existingModelCompare;
 if (existingReviews) site.reviews = existingReviews;

@@ -2,6 +2,13 @@ import { createClient } from "@/lib/supabase";
 
 async function checkSupabaseConnection(): Promise<{ ok: boolean; error?: string }> {
   try {
+    const url = process.env.NEXT_PUBLIC_SUPABASE_URL;
+    const anonKey = process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY;
+
+    if (!url || !anonKey) {
+      return { ok: false, error: "Variáveis NEXT_PUBLIC_SUPABASE_* não configuradas" };
+    }
+
     const supabase = createClient();
     const { error } = await supabase.auth.getSession();
 

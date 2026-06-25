@@ -1,10 +1,21 @@
 {
+  "$schema": "https://openapi.vercel.sh/vercel.json",
   "buildCommand": "node scripts/prepare-deploy.mjs",
   "outputDirectory": "site",
   "installCommand": "",
   "framework": null,
+  "git": {
+    "deploymentEnabled": {
+      "main": true,
+      "desenvolvimento": false,
+      "*": false
+    }
+  },
   "rewrites": [
-    { "source": "/parceiro", "destination": "/parceiro/login.html" }
+    { "source": "/parceiro", "destination": "/parceiro/login.html" },
+    { "source": "/checkout", "destination": "/checkout.html" },
+    { "source": "/carrinho", "destination": "/carrinho.html" },
+    { "source": "/pagamento", "destination": "/pagamento.html" }
   ],
   "redirects": [
     { "source": "/seja-parceiro", "destination": "/", "permanent": true },
