@@ -1,8 +1,16 @@
 {
+  "$schema": "https://openapi.vercel.sh/vercel.json",
   "buildCommand": "node scripts/prepare-deploy.mjs",
   "outputDirectory": "site",
   "installCommand": "",
   "framework": null,
+  "git": {
+    "deploymentEnabled": {
+      "main": true,
+      "desenvolvimento": false,
+      "*": false
+    }
+  },
   "rewrites": [
     { "source": "/parceiro", "destination": "/parceiro/login.html" }
   ],

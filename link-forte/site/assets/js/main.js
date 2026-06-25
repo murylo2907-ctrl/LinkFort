@@ -955,19 +955,23 @@ async function renderHeroPriceWidget() {
   }
 }
 
+const HERO_WHATSAPP_DEFAULT =
+  "Olá! Gostaria de falar com um especialista sobre certificado digital.";
+
 function initHeroWhatsApp(message) {
   const btn = document.querySelector(".js-hero-wpp");
   if (!btn) return;
 
-  btn.addEventListener("click", (e) => {
-    e.preventDefault();
-    const text = appendReferralToMessage(message || "Olá! Gostaria de falar com um especialista sobre certificado digital.");
-    window.open(`https://wa.me/${SITE.whatsapp}?text=${encodeURIComponent(text)}`, "_blank");
-  });
+  const text = appendReferralToMessage(message || HERO_WHATSAPP_DEFAULT);
+  btn.href = `https://wa.me/${SITE.whatsapp}?text=${encodeURIComponent(text)}`;
+  btn.target = "_blank";
+  btn.rel = "noopener";
 }
 
 async function initHeroHome() {
   if (document.body.dataset.page !== "home") return;
+
+  initHeroWhatsApp();
 
   try {
     const config = await loadSiteConfig();
