@@ -7,11 +7,21 @@ const outPath = join(root, "site/assets/js/supabase-config.js");
 const localPath = join(root, "site/assets/js/supabase-config.js");
 const examplePath = join(root, "site/assets/js/supabase-config.example.js");
 
+const apiOutPath = join(root, "site/assets/js/api-config.js");
+const apiLocalPath = join(root, "site/assets/js/api-config.js");
+const apiExamplePath = join(root, "site/assets/js/api-config.example.js");
+
 function readFromFile(path) {
   const content = readFileSync(path, "utf8");
   const url = content.match(/SUPABASE_URL\s*=\s*"([^"]+)"/)?.[1];
   const key = content.match(/SUPABASE_ANON_KEY\s*=\s*"([^"]+)"/)?.[1];
   return { url, key };
+}
+
+function readApiFromFile(path) {
+  const content = readFileSync(path, "utf8");
+  const apiUrl = content.match(/LF_API_BASE_URL\s*=\s*"([^"]+)"/)?.[1];
+  return { apiUrl };
 }
 
 let url = process.env.SUPABASE_URL?.trim();
@@ -41,3 +51,18 @@ window.SUPABASE_ANON_KEY = "${key}";
 
 writeFileSync(outPath, body, "utf8");
 console.log("supabase-config.js gerado para deploy.");
+
+let apiUrl = process.env.LF_API_BASE_URL?.trim();
+
+if (!apiUrl) {
+  const apiSource = existsSync(apiLocalPath) ? apiLocalPath : apiExamplePath;
+  const fromApiFile = readApiFromFile(apiSource);
+  apiUrl = fromApiFile.apiUrl || "http://localhost:3001";
+}
+
+const apiBody = `// Gerado em deploy — não commitar (ver .gitignore)
+window.LF_API_BASE_URL = "${apiUrl}";
+`;
+
+writeFileSync(apiOutPath, apiBody, "utf8");
+console.log(`api-config.js gerado para deploy${apiUrl ? "" : " (sem API Next.js — cupons via Supabase RPC)"}.`);
