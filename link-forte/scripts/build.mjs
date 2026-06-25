@@ -222,6 +222,37 @@ for (const page of pagesRaw) {
   };
 }
 
+const DEFAULT_PERSONAS = {
+  title: "Qual é o seu perfil?",
+  subtitle: "Escolha abaixo e vá direto ao conteúdo certo — sem precisar navegar pelo site",
+  items: [
+    {
+      id: "pf",
+      title: "Pessoa Física",
+      description: "e-CPF para IR, eSocial, assinatura digital e serviços gov.br",
+      cta: "Configurar e-CPF",
+      href: "loja.html?tipo=ecpf#cotador-certificado",
+      icon: "user",
+    },
+    {
+      id: "pj",
+      title: "Pessoa Jurídica",
+      description: "e-CNPJ para NF-e, SPED, contratos e obrigações da empresa",
+      cta: "Configurar e-CNPJ",
+      href: "loja.html?tipo=ecnpj#cotador-certificado",
+      icon: "building",
+    },
+    {
+      id: "contador",
+      title: "Contador",
+      description: "Emissão para clientes PF e PJ com atendimento especializado",
+      cta: "Falar com especialista",
+      href: "contato.html?perfil=contador",
+      icon: "calculator",
+    },
+  ],
+};
+
 const sitePath = path.join(dataDir, "site.json");
 let existingHero;
 let existingNavigation;
@@ -267,7 +298,7 @@ const site = {
 
 if (existingHero) site.hero = existingHero;
 if (existingNavigation) site.navigation = existingNavigation;
-if (existingPersonas) site.personas = existingPersonas;
+site.personas = existingPersonas || DEFAULT_PERSONAS;
 if (existingAcquisitionSteps) site.acquisitionSteps = existingAcquisitionSteps;
 if (existingModelCompare) site.modelCompare = existingModelCompare;
 if (existingReviews) site.reviews = existingReviews;

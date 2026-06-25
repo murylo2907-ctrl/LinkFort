@@ -1054,18 +1054,16 @@ const DEFAULT_PERSONAS = {
   ],
 };
 
-async function initPersonaCards() {
-  const container = document.getElementById("personas-home");
-  if (!container || document.body.dataset.page !== "home") return;
+function resolvePersonasSection(config = {}) {
+  const fromConfig = config.personas || {};
+  return {
+    ...DEFAULT_PERSONAS,
+    ...fromConfig,
+    items: fromConfig.items?.length ? fromConfig.items : DEFAULT_PERSONAS.items,
+  };
+}
 
-  let section = DEFAULT_PERSONAS;
-  try {
-    const config = await loadSiteConfig();
-    if (config.personas?.items?.length) section = config.personas;
-  } catch {
-    /* fallback */
-  }
-
+function renderPersonasSection(container, section) {
   const block = container.closest(".section-personas");
   const titleEl = block?.querySelector(".section-header h2");
   const subtitleEl = block?.querySelector(".section-header p");
@@ -1073,7 +1071,23 @@ async function initPersonaCards() {
   if (subtitleEl && section.subtitle) subtitleEl.textContent = section.subtitle;
 
   const basePath = getBasePath();
-  container.innerHTML = section.items.map((persona) => renderPersonaCard(persona, basePath)).join("");
+  container.innerHTML = section.items
+    .map((persona) => renderPersonaCard(persona, basePath))
+    .join("");
+}
+
+async function initPersonaCards() {
+  const container = document.getElementById("personas-home");
+  if (!container || document.body.dataset.page !== "home") return;
+
+  renderPersonasSection(container, DEFAULT_PERSONAS);
+
+  try {
+    const config = await loadSiteConfig();
+    renderPersonasSection(container, resolvePersonasSection(config));
+  } catch {
+    /* mantém fallback já renderizado */
+  }
 }
 
 const DEFAULT_ACQUISITION_STEPS = {

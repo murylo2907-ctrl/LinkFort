@@ -10,6 +10,36 @@
     "instagram": "https://www.instagram.com/linkforte",
     "facebook": "https://www.facebook.com/linkforte"
   },
-  "scrapedAt": "2026-06-24T13:36:39.368Z",
-  "source": "https://linkforte.com.br"
+  "scrapedAt": "2026-06-25T21:57:03.580Z",
+  "source": "https://linkforte.com.br",
+  "personas": {
+    "title": "Qual é o seu perfil?",
+    "subtitle": "Escolha abaixo e vá direto ao conteúdo certo — sem precisar navegar pelo site",
+    "items": [
+      {
+        "id": "pf",
+        "title": "Pessoa Física",
+        "description": "e-CPF para IR, eSocial, assinatura digital e serviços gov.br",
+        "cta": "Configurar e-CPF",
+        "href": "loja.html?tipo=ecpf#cotador-certificado",
+        "icon": "user"
+      },
+      {
+        "id": "pj",
+        "title": "Pessoa Jurídica",
+        "description": "e-CNPJ para NF-e, SPED, contratos e obrigações da empresa",
+        "cta": "Configurar e-CNPJ",
+        "href": "loja.html?tipo=ecnpj#cotador-certificado",
+        "icon": "building"
+      },
+      {
+        "id": "contador",
+        "title": "Contador",
+        "description": "Emissão para clientes PF e PJ com atendimento especializado",
+        "cta": "Falar com especialista",
+        "href": "contato.html?perfil=contador",
+        "icon": "calculator"
+      }
+    ]
+  }
 }
